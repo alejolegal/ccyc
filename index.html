@@ -1,15 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Código Civil y Comercial de la Nación - Edición Digital</title>
-  
-  <!-- Enlace a la hoja de estilo externa -->
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
+  <!-- ENCABEZADO -->
   <header>
     <div class="header-container">
       <div class="brand">
@@ -19,27 +18,35 @@
           <p>República Argentina · Ley 26.994</p>
         </div>
       </div>
-      <div class="tabs">
-        <button id="btn-tab-search" class="tab-btn active" onclick="setMode('search')">Buscador</button>
-        <button id="btn-tab-book" class="tab-btn" onclick="setMode('book')">Lector</button>
+
+      <div class="header-controls">
+        <div class="tabs">
+          <button id="btn-tab-search" class="tab-btn active" onclick="setMode('search')">Buscador</button>
+          <button id="btn-tab-book" class="tab-btn" onclick="setMode('book')">Lector</button>
+        </div>
+
+        <button id="btnThemeToggle" class="theme-toggle-btn" type="button" aria-label="Cambiar tema visual">
+          <span id="themeIcon">☀️</span>
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- CONTENIDO PRINCIPAL -->
   <main>
     <div class="status-banner">
       <span class="status-text">Base normativa activa:</span>
-      <span id="articlesCount" class="status-badge">Cargando...</span>
+      <span id="articlesCount" class="status-badge">Cargando artículos...</span>
     </div>
 
-    <!-- BUSCADOR -->
+    <!-- VISTA 1: BUSCADOR -->
     <section id="view-search">
       <div class="search-box">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="search-header-row">
           <label>Buscador de Artículos (1 al 2671)</label>
-          <span style="font-size:0.75rem; color:var(--text-muted);">Usa ⭐ para fijar tus artículos</span>
+          <span class="search-hint">Usa ⭐ para fijar tus artículos</span>
         </div>
-        
+
         <div class="search-input-wrap">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -53,10 +60,11 @@
           />
         </div>
 
+        <!-- ACCESOS RÁPIDOS -->
         <div class="quick-tags-container">
           <div class="quick-tags-header">
             <span class="quick-tags-label">Mis Accesos Rápidos:</span>
-            <button class="btn-text-action" onclick="restablecerRapidos()">Restablecer</button>
+            <button class="btn-text-action" type="button" onclick="restablecerRapidos()">Restablecer</button>
           </div>
           <div class="quick-tags" id="quickTagsContainer"></div>
         </div>
@@ -65,13 +73,14 @@
       <div id="searchResults"></div>
     </section>
 
-    <!-- LECTOR -->
+    <!-- VISTA 2: LECTOR CONTINUO -->
     <section id="view-book" class="hidden">
       <div class="book-layout">
+        
         <aside class="book-sidebar" id="bookSidebar">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+          <div class="sidebar-header-row">
             <h3>Estructura del Código</h3>
-            <button onclick="toggleMobileIndex(false)" style="border:none; background:transparent; font-size:1.1rem; cursor:pointer;" id="btnCloseSheet">✕</button>
+            <button onclick="toggleMobileIndex(false)" class="btn-close-sheet" type="button" id="btnCloseSheet">✕</button>
           </div>
           
           <div class="book-filter-box">
@@ -106,8 +115,8 @@
           <div id="bookContent"></div>
 
           <div class="nav-book-buttons">
-            <button class="btn-nav" onclick="articuloAnterior()">← Artículo Anterior</button>
-            <button class="btn-nav" onclick="articuloSiguiente()">Artículo Siguiente →</button>
+            <button class="btn-nav" type="button" onclick="articuloAnterior()">← Artículo Anterior</button>
+            <button class="btn-nav" type="button" onclick="articuloSiguiente()">Artículo Siguiente →</button>
           </div>
         </article>
       </div>
@@ -115,7 +124,7 @@
   </main>
 
   <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileIndex(false)"></div>
-  <button class="mobile-index-trigger" id="btnMobileIndex" onclick="toggleMobileIndex()">
+  <button class="mobile-index-trigger" id="btnMobileIndex" type="button" onclick="toggleMobileIndex()">
     📑 Índice del Código
   </button>
 
@@ -124,6 +133,36 @@
   </footer>
 
   <script>
+    /* LÓGICA DE TEMAS */
+    const TEMAS = ['light', 'dark', 'sepia'];
+    const ICONOS_TEMA = { light: '☀️', dark: '🌙', sepia: '📜' };
+
+    function aplicarTema(tema) {
+      document.documentElement.setAttribute('data-theme', tema);
+      document.body.setAttribute('data-theme', tema);
+      localStorage.setItem('ccyc_tema', tema);
+      
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.innerText = ICONOS_TEMA[tema] || '☀️';
+      }
+    }
+
+    function toggleTema() {
+      const actual = localStorage.getItem('ccyc_tema') || 'light';
+      let siguienteIndex = TEMAS.indexOf(actual) + 1;
+      if (siguienteIndex >= TEMAS.length) siguienteIndex = 0;
+      aplicarTema(TEMAS[siguienteIndex]);
+    }
+
+    // Vinculación directa por evento
+    const themeBtn = document.getElementById('btnThemeToggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', toggleTema);
+    }
+    aplicarTema(localStorage.getItem('ccyc_tema') || 'light');
+
+    /* BASE DE DATOS Y RÁPIDOS */
     let articulos = [];
     let articuloActualNumero = 1;
 
@@ -134,7 +173,6 @@
       { num: 1187, label: "Art. 1187 (Locación)" },
       { num: 1708, label: "Art. 1708 (Daños)" }
     ];
-
     let misRapidos = [];
 
     function cargarRapidos() {
@@ -172,7 +210,7 @@
     }
 
     function restablecerRapidos() {
-      if (confirm('¿Restablecer accesos rápidos originales?')) {
+      if (confirm('¿Restablecer accesos rápidos predeterminados?')) {
         misRapidos = [...RAPIDOS_DEFAULT];
         guardarRapidos();
       }
@@ -182,13 +220,13 @@
       const c = document.getElementById('quickTagsContainer');
       if (!c) return;
       if (misRapidos.length === 0) {
-        c.innerHTML = `<span style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.</span>`;
+        c.innerHTML = '<span class="tag-empty-hint">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.</span>';
         return;
       }
       c.innerHTML = misRapidos.map(r => `
         <div class="tag-pill" onclick="quickSearch('${r.num}')">
           <span>${r.label}</span>
-          <button class="tag-close-btn" onclick="eliminarRapido(event, ${r.num})">×</button>
+          <button class="tag-close-btn" type="button" onclick="eliminarRapido(event, ${r.num})">×</button>
         </div>
       `).join('');
     }
@@ -215,13 +253,15 @@
       document.getElementById('view-book').classList.toggle('hidden', isSearch);
       document.getElementById('btn-tab-search').classList.toggle('active', isSearch);
       document.getElementById('btn-tab-book').classList.toggle('active', !isSearch);
-      document.getElementById('btnMobileIndex').style.display = isSearch ? 'none' : '';
+
+      const btnFloat = document.getElementById('btnMobileIndex');
+      if (btnFloat) btnFloat.style.display = isSearch ? 'none' : '';
     }
 
     function renderSearchResults(list) {
       const container = document.getElementById('searchResults');
       if (!list || list.length === 0) {
-        container.innerHTML = `<div class="article-card" style="text-align:center; color:#64748b;">No se encontraron artículos.</div>`;
+        container.innerHTML = '<div class="article-card card-empty">No se encontraron artículos con ese criterio.</div>';
         return;
       }
 
@@ -236,17 +276,21 @@
               <h2 class="card-title">ARTÍCULO ${art.numero}° - ${art.titulo || ''}</h2>
               <div class="card-subtitle">${art.capitulo || ''}</div>
             </div>
-            <div style="display:flex; gap:0.5rem;">
-              <button class="pin-btn ${fijado ? 'pinned' : ''}" onclick="togglePinRapido(${art.numero}, '${(art.titulo || '').replace(/'/g, "\\'")}')">
+            <div class="card-actions">
+              <button class="pin-btn ${fijado ? 'pinned' : ''}" type="button" onclick="togglePinRapido(${art.numero}, '${(art.titulo || '').replace(/'/g, "\\'")}')">
                 ${fijado ? '★ Fijado' : '☆ Pin'}
               </button>
-              <button class="copy-btn" onclick="copiarCita(${art.numero})">Copiar</button>
+              <button class="copy-btn" type="button" onclick="copiarCita(${art.numero})">Copiar</button>
             </div>
           </div>
           <p class="card-body">${art.texto}</p>
         </div>
         `;
       }).join('');
+
+      if (list.length > 50) {
+        container.innerHTML += `<p class="pagination-hint">Mostrando los primeros 50 de ${list.length} resultados.</p>`;
+      }
     }
 
     function handleSearch(val) {
@@ -278,7 +322,7 @@
       const container = document.getElementById('bookIndex');
       if (!container) return;
       container.innerHTML = lista.map(art => `
-        <button class="book-index-item" onclick="selectArticleForBook(${art.numero})">
+        <button class="book-index-item" type="button" onclick="selectArticleForBook(${art.numero})">
           <strong>Art. ${art.numero}</strong> - ${art.titulo || ''}
         </button>
       `).join('');
@@ -310,10 +354,10 @@
       articuloActualNumero = art.numero;
       document.getElementById('bookHeaderLocation').innerText = `${art.libro || 'Código Civil y Comercial'} · Art. ${art.numero}`;
       document.getElementById('bookContent').innerHTML = `
-        <h2 style="font-size:1.4rem; color:var(--primary-navy); margin-bottom:1rem; font-weight:700;">
+        <h2 class="book-sheet-title">
           ARTÍCULO ${art.numero}° - ${art.titulo || ''}
         </h2>
-        <p style="font-size:1.05rem; line-height:1.85; text-align:justify; color:#334155;">
+        <p class="book-sheet-text">
           ${art.texto}
         </p>
       `;
@@ -334,7 +378,7 @@
       if (!art) return;
       const cita = `Art. ${art.numero}.- ${art.titulo ? art.titulo + '. ' : ''}${art.texto} (Código Civil y Comercial de la Nación, Ley 26.994).`;
       navigator.clipboard.writeText(cita);
-      alert('Artículo copiado al portapapeles.');
+      alert('Artículo copiado con formato de cita legal.');
     }
 
     function toggleMobileIndex(forzar) {
@@ -351,7 +395,8 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       inicializar();
-      document.getElementById('btnMobileIndex').style.display = 'none';
+      const btnMobile = document.getElementById('btnMobileIndex');
+      if (btnMobile) btnMobile.style.display = 'none';
     });
   </script>
 </body>
