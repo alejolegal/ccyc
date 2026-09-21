@@ -1,0 +1,358 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Código Civil y Comercial de la Nación - Edición Digital</title>
+  
+  <!-- Enlace a la hoja de estilo externa -->
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">⚖️</div>
+        <div>
+          <h1>CÓDIGO CIVIL Y COMERCIAL</h1>
+          <p>República Argentina · Ley 26.994</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <button id="btn-tab-search" class="tab-btn active" onclick="setMode('search')">Buscador</button>
+        <button id="btn-tab-book" class="tab-btn" onclick="setMode('book')">Lector</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="status-banner">
+      <span class="status-text">Base normativa activa:</span>
+      <span id="articlesCount" class="status-badge">Cargando...</span>
+    </div>
+
+    <!-- BUSCADOR -->
+    <section id="view-search">
+      <div class="search-box">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label>Buscador de Artículos (1 al 2671)</label>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Usa ⭐ para fijar tus artículos</span>
+        </div>
+        
+        <div class="search-input-wrap">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Escribí un número (ej: 750, 1187, 1708) o término..." 
+            oninput="handleSearch(this.value)"
+          />
+        </div>
+
+        <div class="quick-tags-container">
+          <div class="quick-tags-header">
+            <span class="quick-tags-label">Mis Accesos Rápidos:</span>
+            <button class="btn-text-action" onclick="restablecerRapidos()">Restablecer</button>
+          </div>
+          <div class="quick-tags" id="quickTagsContainer"></div>
+        </div>
+      </div>
+
+      <div id="searchResults"></div>
+    </section>
+
+    <!-- LECTOR -->
+    <section id="view-book" class="hidden">
+      <div class="book-layout">
+        <aside class="book-sidebar" id="bookSidebar">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+            <h3>Estructura del Código</h3>
+            <button onclick="toggleMobileIndex(false)" style="border:none; background:transparent; font-size:1.1rem; cursor:pointer;" id="btnCloseSheet">✕</button>
+          </div>
+          
+          <div class="book-filter-box">
+            <select id="selectLibro" class="book-select" onchange="filtrarIndicePorLibro(this.value)">
+              <option value="TODOS">Todos los Libros (1 al 2671)</option>
+              <option value="Título Preliminar">Título Preliminar (1 al 18)</option>
+              <option value="Libro Primero">Libro I - Parte General (19 al 400)</option>
+              <option value="Libro Segundo">Libro II - Familia (401 al 723)</option>
+              <option value="Libro Tercero">Libro III - Derechos Personales (724 al 1881)</option>
+              <option value="Libro Cuarto">Libro IV - Derechos Reales (1882 al 2276)</option>
+              <option value="Libro Quinto">Libro V - Sucesiones (2277 al 2531)</option>
+              <option value="Libro Sexto">Libro VI - Disposiciones Comunes (2532 al 2671)</option>
+            </select>
+            <input 
+              type="text" 
+              id="filtroIndiceInput" 
+              class="book-quick-search" 
+              placeholder="Filtrar artículo..." 
+              oninput="filtrarArticulosIndice(this.value)"
+            />
+          </div>
+
+          <div class="book-index-container" id="bookIndex"></div>
+        </aside>
+
+        <article class="book-sheet">
+          <div class="book-sheet-header">
+            <span id="bookHeaderLocation">Título Preliminar</span>
+            <span>Ley 26.994</span>
+          </div>
+
+          <div id="bookContent"></div>
+
+          <div class="nav-book-buttons">
+            <button class="btn-nav" onclick="articuloAnterior()">← Artículo Anterior</button>
+            <button class="btn-nav" onclick="articuloSiguiente()">Artículo Siguiente →</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileIndex(false)"></div>
+  <button class="mobile-index-trigger" id="btnMobileIndex" onclick="toggleMobileIndex()">
+    📑 Índice del Código
+  </button>
+
+  <footer>
+    Portal del Código Civil y Comercial de la Nación · República Argentina
+  </footer>
+
+  <script>
+    let articulos = [];
+    let articuloActualNumero = 1;
+
+    const RAPIDOS_DEFAULT = [
+      { num: 1, label: "Art. 1 (Fuentes)" },
+      { num: 9, label: "Art. 9 (Buena fe)" },
+      { num: 724, label: "Art. 724 (Obligaciones)" },
+      { num: 1187, label: "Art. 1187 (Locación)" },
+      { num: 1708, label: "Art. 1708 (Daños)" }
+    ];
+
+    let misRapidos = [];
+
+    function cargarRapidos() {
+      const guardados = localStorage.getItem('ccyc_mis_rapidos');
+      if (guardados) {
+        try { misRapidos = JSON.parse(guardados); } catch(e) { misRapidos = [...RAPIDOS_DEFAULT]; }
+      } else {
+        misRapidos = [...RAPIDOS_DEFAULT];
+      }
+      renderQuickTags();
+    }
+
+    function guardarRapidos() {
+      localStorage.setItem('ccyc_mis_rapidos', JSON.stringify(misRapidos));
+      renderQuickTags();
+      const q = document.getElementById('searchInput').value;
+      if (!q) renderSearchResults(articulos); else handleSearch(q);
+    }
+
+    function togglePinRapido(num, titulo) {
+      const idx = misRapidos.findIndex(r => r.num === num);
+      if (idx >= 0) {
+        misRapidos.splice(idx, 1);
+      } else {
+        const corto = titulo ? titulo.split(',')[0].slice(0, 16) : '';
+        misRapidos.push({ num: num, label: `Art. ${num}${corto ? ' (' + corto + ')' : ''}` });
+      }
+      guardarRapidos();
+    }
+
+    function eliminarRapido(e, num) {
+      e.stopPropagation();
+      misRapidos = misRapidos.filter(r => r.num !== num);
+      guardarRapidos();
+    }
+
+    function restablecerRapidos() {
+      if (confirm('¿Restablecer accesos rápidos originales?')) {
+        misRapidos = [...RAPIDOS_DEFAULT];
+        guardarRapidos();
+      }
+    }
+
+    function renderQuickTags() {
+      const c = document.getElementById('quickTagsContainer');
+      if (!c) return;
+      if (misRapidos.length === 0) {
+        c.innerHTML = `<span style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.</span>`;
+        return;
+      }
+      c.innerHTML = misRapidos.map(r => `
+        <div class="tag-pill" onclick="quickSearch('${r.num}')">
+          <span>${r.label}</span>
+          <button class="tag-close-btn" onclick="eliminarRapido(event, ${r.num})">×</button>
+        </div>
+      `).join('');
+    }
+
+    async function inicializar() {
+      cargarRapidos();
+      try {
+        const res = await fetch('articulos.json');
+        if (res.ok) {
+          articulos = await res.json();
+          document.getElementById('articlesCount').innerText = `${articulos.length} artículos`;
+          renderSearchResults(articulos);
+          renderIndexList(articulos);
+          if (articulos.length > 0) renderBookView(articulos[0]);
+        }
+      } catch (err) {
+        console.error("Error al cargar articulos.json:", err);
+      }
+    }
+
+    function setMode(mode) {
+      const isSearch = mode === 'search';
+      document.getElementById('view-search').classList.toggle('hidden', !isSearch);
+      document.getElementById('view-book').classList.toggle('hidden', isSearch);
+      document.getElementById('btn-tab-search').classList.toggle('active', isSearch);
+      document.getElementById('btn-tab-book').classList.toggle('active', !isSearch);
+      document.getElementById('btnMobileIndex').style.display = isSearch ? 'none' : '';
+    }
+
+    function renderSearchResults(list) {
+      const container = document.getElementById('searchResults');
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="article-card" style="text-align:center; color:#64748b;">No se encontraron artículos.</div>`;
+        return;
+      }
+
+      const muestra = list.slice(0, 50);
+      container.innerHTML = muestra.map(art => {
+        const fijado = misRapidos.some(r => r.num === art.numero);
+        return `
+        <div class="article-card">
+          <div class="card-top">
+            <div>
+              <div class="card-meta">${art.libro || 'Código Civil y Comercial'}</div>
+              <h2 class="card-title">ARTÍCULO ${art.numero}° - ${art.titulo || ''}</h2>
+              <div class="card-subtitle">${art.capitulo || ''}</div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="pin-btn ${fijado ? 'pinned' : ''}" onclick="togglePinRapido(${art.numero}, '${(art.titulo || '').replace(/'/g, "\\'")}')">
+                ${fijado ? '★ Fijado' : '☆ Pin'}
+              </button>
+              <button class="copy-btn" onclick="copiarCita(${art.numero})">Copiar</button>
+            </div>
+          </div>
+          <p class="card-body">${art.texto}</p>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function handleSearch(val) {
+      const q = val.trim().toLowerCase();
+      if (!q) { renderSearchResults(articulos); return; }
+
+      const matchNum = q.match(/\\d+/);
+      if (matchNum) {
+        const n = parseInt(matchNum[0], 10);
+        const exact = articulos.filter(a => a.numero === n);
+        if (exact.length > 0) { renderSearchResults(exact); return; }
+      }
+
+      const filtered = articulos.filter(a =>
+        a.numero.toString() === q ||
+        (a.titulo && a.titulo.toLowerCase().includes(q)) ||
+        (a.texto && a.texto.toLowerCase().includes(q))
+      );
+      renderSearchResults(filtered);
+    }
+
+    function quickSearch(t) {
+      const input = document.getElementById('searchInput');
+      input.value = t;
+      handleSearch(t);
+    }
+
+    function renderIndexList(lista) {
+      const container = document.getElementById('bookIndex');
+      if (!container) return;
+      container.innerHTML = lista.map(art => `
+        <button class="book-index-item" onclick="selectArticleForBook(${art.numero})">
+          <strong>Art. ${art.numero}</strong> - ${art.titulo || ''}
+        </button>
+      `).join('');
+    }
+
+    function filtrarIndicePorLibro(libro) {
+      document.getElementById('filtroIndiceInput').value = '';
+      if (libro === 'TODOS') renderIndexList(articulos);
+      else renderIndexList(articulos.filter(a => a.libro && a.libro.includes(libro)));
+    }
+
+    function filtrarArticulosIndice(valor) {
+      const val = valor.trim().toLowerCase();
+      const libro = document.getElementById('selectLibro').value;
+      let base = (libro === 'TODOS') ? articulos : articulos.filter(a => a.libro && a.libro.includes(libro));
+      if (!val) { renderIndexList(base); return; }
+      renderIndexList(base.filter(a => a.numero.toString().includes(val) || (a.titulo && a.titulo.toLowerCase().includes(val))));
+    }
+
+    function selectArticleForBook(num) {
+      const art = articulos.find(a => a.numero === num);
+      if (art) {
+        renderBookView(art);
+        if (window.innerWidth <= 820) toggleMobileIndex(false);
+      }
+    }
+
+    function renderBookView(art) {
+      articuloActualNumero = art.numero;
+      document.getElementById('bookHeaderLocation').innerText = `${art.libro || 'Código Civil y Comercial'} · Art. ${art.numero}`;
+      document.getElementById('bookContent').innerHTML = `
+        <h2 style="font-size:1.4rem; color:var(--primary-navy); margin-bottom:1rem; font-weight:700;">
+          ARTÍCULO ${art.numero}° - ${art.titulo || ''}
+        </h2>
+        <p style="font-size:1.05rem; line-height:1.85; text-align:justify; color:#334155;">
+          ${art.texto}
+        </p>
+      `;
+    }
+
+    function articuloSiguiente() {
+      const sig = articulos.find(a => a.numero === articuloActualNumero + 1);
+      if (sig) renderBookView(sig);
+    }
+
+    function articuloAnterior() {
+      const ant = articulos.find(a => a.numero === articuloActualNumero - 1);
+      if (ant) renderBookView(ant);
+    }
+
+    function copiarCita(num) {
+      const art = articulos.find(a => a.numero === num);
+      if (!art) return;
+      const cita = `Art. ${art.numero}.- ${art.titulo ? art.titulo + '. ' : ''}${art.texto} (Código Civil y Comercial de la Nación, Ley 26.994).`;
+      navigator.clipboard.writeText(cita);
+      alert('Artículo copiado al portapapeles.');
+    }
+
+    function toggleMobileIndex(forzar) {
+      const sidebar = document.getElementById('bookSidebar');
+      const overlay = document.getElementById('mobileOverlay');
+      if (forzar === false || sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      inicializar();
+      document.getElementById('btnMobileIndex').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
