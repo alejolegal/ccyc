@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Código Civil y Comercial de la Nación - Edición Digital</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -123,6 +123,7 @@
     </section>
   </main>
 
+  <!-- CONTROLES MÓVILES -->
   <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileIndex(false)"></div>
   <button class="mobile-index-trigger" id="btnMobileIndex" type="button" onclick="toggleMobileIndex()">
     📑 Índice del Código
@@ -133,7 +134,7 @@
   </footer>
 
   <script>
-    /* LÓGICA DE TEMAS */
+    /* GESTIÓN DE TEMAS VISUALES */
     const TEMAS = ['light', 'dark', 'sepia'];
     const ICONOS_TEMA = { light: '☀️', dark: '🌙', sepia: '📜' };
 
@@ -141,28 +142,17 @@
       document.documentElement.setAttribute('data-theme', tema);
       document.body.setAttribute('data-theme', tema);
       localStorage.setItem('ccyc_tema', tema);
-      
       const icon = document.getElementById('themeIcon');
-      if (icon) {
-        icon.innerText = ICONOS_TEMA[tema] || '☀️';
-      }
+      if (icon) icon.innerText = ICONOS_TEMA[tema] || '☀️';
     }
 
     function toggleTema() {
       const actual = localStorage.getItem('ccyc_tema') || 'light';
-      let siguienteIndex = TEMAS.indexOf(actual) + 1;
-      if (siguienteIndex >= TEMAS.length) siguienteIndex = 0;
-      aplicarTema(TEMAS[siguienteIndex]);
+      let sigIndex = (TEMAS.indexOf(actual) + 1) % TEMAS.length;
+      aplicarTema(TEMAS[sigIndex]);
     }
 
-    // Vinculación directa por evento
-    const themeBtn = document.getElementById('btnThemeToggle');
-    if (themeBtn) {
-      themeBtn.addEventListener('click', toggleTema);
-    }
-    aplicarTema(localStorage.getItem('ccyc_tema') || 'light');
-
-    /* BASE DE DATOS Y RÁPIDOS */
+    /* GESTIÓN DE ARTÍCULOS Y PERSISTENCIA */
     let articulos = [];
     let articuloActualNumero = 1;
 
@@ -231,8 +221,14 @@
       `).join('');
     }
 
+    /* INICIALIZACIÓN */
     async function inicializar() {
+      aplicarTema(localStorage.getItem('ccyc_tema') || 'light');
+      const btnTema = document.getElementById('btnThemeToggle');
+      if (btnTema) btnTema.addEventListener('click', toggleTema);
+
       cargarRapidos();
+
       try {
         const res = await fetch('articulos.json');
         if (res.ok) {
@@ -247,6 +243,7 @@
       }
     }
 
+    /* MODO BUSCADOR / LECTOR */
     function setMode(mode) {
       const isSearch = mode === 'search';
       document.getElementById('view-search').classList.toggle('hidden', !isSearch);
@@ -258,6 +255,7 @@
       if (btnFloat) btnFloat.style.display = isSearch ? 'none' : '';
     }
 
+    /* RENDER DE RESULTADOS */
     function renderSearchResults(list) {
       const container = document.getElementById('searchResults');
       if (!list || list.length === 0) {
@@ -297,7 +295,7 @@
       const q = val.trim().toLowerCase();
       if (!q) { renderSearchResults(articulos); return; }
 
-      const matchNum = q.match(/\\d+/);
+      const matchNum = q.match(/\d+/);
       if (matchNum) {
         const n = parseInt(matchNum[0], 10);
         const exact = articulos.filter(a => a.numero === n);
@@ -318,6 +316,7 @@
       handleSearch(t);
     }
 
+    /* ÍNDICE Y LECTOR */
     function renderIndexList(lista) {
       const container = document.getElementById('bookIndex');
       if (!container) return;
