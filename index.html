@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Legal Suite - Normativa Argentina</title>
 
-  <!-- Configuración PWA / Mobile -->
+  <!-- PWA & Mobile Settings -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,16 +14,23 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body data-theme="light">
+  <!-- Telón oscuro para cerrar el menú tocando afuera -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <div class="app-layout">
     
     <!-- Barra lateral / Navegación -->
     <aside class="sidebar" id="sidebar">
-      <div class="brand-header">
-        <div class="brand-logo">⚖️</div>
-        <div class="brand-info">
-          <h2>Legal Suite</h2>
-          <span class="norma-tag" id="lblNormaActiva">CCyC Ley 26.994</span>
+      <div class="sidebar-header">
+        <div class="brand-header">
+          <div class="brand-logo">⚖️</div>
+          <div class="brand-info">
+            <h2>Legal Suite</h2>
+            <span class="norma-tag" id="lblNormaActiva">CCyC Ley 26.994</span>
+          </div>
         </div>
+        <!-- Botón para retroceder / cerrar menú en móviles -->
+        <button id="btnCloseSidebar" class="btn-close-sidebar" title="Cerrar índice">✕</button>
       </div>
 
       <!-- Selector de norma -->
@@ -35,9 +42,9 @@
         </select>
       </div>
 
-      <!-- Índice dinámico de libros/partes -->
+      <!-- Índice dinámico de libros -->
       <nav class="nav-index" id="navIndex">
-        <!-- Renderizado dinámicamente -->
+        <!-- Generado dinámicamente -->
       </nav>
 
       <!-- Pie de barra lateral -->
@@ -58,14 +65,14 @@
           <button id="btnMobileIndex" class="btn-icon" title="Abrir índice">☰</button>
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="inputBusqueda" placeholder="Buscar por número o palabra clave (ej: 765, alimentos, dominio)..." autocomplete="off">
+            <input type="text" id="inputBusqueda" placeholder="Buscar por número o término..." autocomplete="off">
             <button id="btnClearSearch" class="btn-clear" style="display: none;">✕</button>
           </div>
         </div>
 
         <div class="topbar-right">
-          <!-- Botón de instalación PWA -->
-          <button id="btnInstalarApp" class="btn-instalar" style="display: none;">
+          <!-- Botón directo a la guía de instalación -->
+          <button id="btnAbrirModalInstalar" class="btn-instalar" title="Cómo instalar">
             📲 Instalar App
           </button>
 
@@ -78,18 +85,19 @@
 
       <!-- Barra de accesos rápidos -->
       <section class="quick-access-bar" id="quickAccessBar">
-        <!-- Generado dinámicamente según la norma -->
+        <!-- Renderizado dinámico -->
       </section>
 
       <!-- Contenedor de visualización de artículos -->
       <section class="articles-container" id="articlesContainer">
         <div class="loading-state" id="loadingState">
-          <div class="spinner"></div>
           <p>Cargando cuerpo normativo...</p>
         </div>
       </section>
 
-      <!-- Pie de página con copyright -->
+      <button id="btnLoadMore" class="btn-load-more" style="display: none;">Cargar más artículos</button>
+
+      <!-- Pie de página -->
       <footer class="app-footer">
         <p>© 2026 Legal Suite • Todos los derechos reservados. Desarrollado para estudiantes y profesionales de Derecho.</p>
       </footer>
@@ -97,22 +105,56 @@
 
   </div>
 
-  <!-- Banner explicativo exclusivo para iPhone / iOS -->
-  <div id="iosInstallBanner" class="ios-install-banner" style="display: none;">
-    <div class="ios-banner-header">
-      <h4>⚖️ Instalar en tu iPhone</h4>
-      <button id="btnCloseIosBanner" class="ios-banner-close" aria-label="Cerrar">✕</button>
-    </div>
-    <div class="ios-banner-body">
-      <p>Usá la app a pantalla completa y sin internet:</p>
-      <div class="ios-step">
-        <span class="ios-step-icon">1</span>
-        <span>Tocá el botón <strong>Compartir</strong> en la barra inferior (⎋).</span>
+  <!-- MODAL DE INSTRUCCIONES DE DESCARGA / INSTALACIÓN -->
+  <div class="modal-overlay" id="modalInstalar">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📲 Usar Legal Suite Offline</h3>
+        <button id="btnCloseModalInstalar" class="btn-close-modal">✕</button>
       </div>
-      <div class="ios-step">
-        <span class="ios-step-icon">2</span>
-        <span>Seleccioná <strong>"Agregar a inicio"</strong> (➕).</span>
+
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Podés usar Legal Suite como página web normal o instalarla en tu teléfono para abrirla a pantalla completa y consultar los artículos <strong>sin conexión a internet</strong>:
+      </p>
+
+      <!-- Sección iPhone -->
+      <div class="modal-section">
+        <h4>🍏 En iPhone / iPad (Safari o Brave)</h4>
+        <div class="modal-step">
+          <span class="step-num">1</span>
+          <span>Abrí la página en tu navegador y tocá el botón de <strong>Compartir</strong> en la barra inferior (el cuadrado con la flecha hacia arriba <strong>⎋</strong>).</span>
+        </div>
+        <div class="modal-step">
+          <span class="step-num">2</span>
+          <span>Deslizá hacia abajo y seleccioná <strong>"Agregar a inicio"</strong> (<strong>➕</strong>).</span>
+        </div>
+        <div class="modal-step">
+          <span class="step-num">3</span>
+          <span>Tocá <strong>"Agregar"</strong> arriba a la derecha. ¡Listo! Queda instalada como una app nativa.</span>
+        </div>
       </div>
+
+      <!-- Sección Android -->
+      <div class="modal-section">
+        <h4>🤖 En Celulares Android (Chrome / Brave)</h4>
+        <div class="modal-step">
+          <span class="step-num">1</span>
+          <span>Tocá los <strong>tres puntos verticales (⋮)</strong> arriba a la derecha del navegador.</span>
+        </div>
+        <div class="modal-step">
+          <span class="step-num">2</span>
+          <span>Elegí la opción <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</span>
+        </div>
+        <div class="modal-step">
+          <span class="step-num">3</span>
+          <span>Aceptá y ya la tendrás en tu pantalla con acceso offline directo.</span>
+        </div>
+      </div>
+
+      <!-- Botón de instalación nativa si el navegador lo soporta -->
+      <button id="btnInstalarNativoModal" class="btn-load-more" style="display: none; background: var(--accent); color: #fff;">
+        ⚡ Instalar ahora en este dispositivo
+      </button>
     </div>
   </div>
 
@@ -122,7 +164,9 @@
        ========================================================================== */
     let articulosCCyC = [];
     let articulosCN = [];
-    let normaActual = 'ccyc'; // 'ccyc' | 'cn'
+    let normaActual = 'ccyc';
+    let listaActualFiltrada = [];
+    let limitePaginado = 40; // Límite para rendimiento suave en celular
     let eventoInstalacion = null;
 
     const articulosContainer = document.getElementById('articlesContainer');
@@ -132,7 +176,19 @@
     const navIndex = document.getElementById('navIndex');
     const quickAccessBar = document.getElementById('quickAccessBar');
     const lblNormaActiva = document.getElementById('lblNormaActiva');
-    const btnInstalar = document.getElementById('btnInstalarApp');
+    const btnLoadMore = document.getElementById('btnLoadMore');
+    
+    // Menú móvil
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const btnMobileIndex = document.getElementById('btnMobileIndex');
+    const btnCloseSidebar = document.getElementById('btnCloseSidebar');
+
+    // Modal de instalación
+    const modalInstalar = document.getElementById('modalInstalar');
+    const btnAbrirModalInstalar = document.getElementById('btnAbrirModalInstalar');
+    const btnCloseModalInstalar = document.getElementById('btnCloseModalInstalar');
+    const btnInstalarNativoModal = document.getElementById('btnInstalarNativoModal');
 
     /* ==========================================================================
        CARGA DE BASES DE DATOS LOCALES
@@ -155,7 +211,7 @@
         const loading = document.getElementById('loadingState');
         if (loading) loading.style.display = 'none';
 
-        renderizarVista();
+        seleccionarLibro(normaActual);
       } catch (error) {
         console.error('Error al cargar normativas:', error);
         articulosContainer.innerHTML = '<p class="error-msg">Error al cargar la base de datos. Verifique los archivos JSON.</p>';
@@ -163,7 +219,7 @@
     }
 
     /* ==========================================================================
-       GESTIÓN DE TEMAS (CLARO / OSCURO / SEPIA)
+       GESTIÓN DE TEMAS
        ========================================================================== */
     function aplicarTema(tema) {
       document.body.setAttribute('data-theme', tema);
@@ -180,7 +236,20 @@
     }
 
     /* ==========================================================================
-       SELECCIÓN DE NORMA Y RENDERIZADO
+       CONTROL DEL MENÚ MÓVIL (ABRIR, CERRAR, RETROCEDER)
+       ========================================================================== */
+    function abrirSidebar() {
+      sidebar.classList.add('open');
+      sidebarOverlay.classList.add('active');
+    }
+
+    function cerrarSidebar() {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    }
+
+    /* ==========================================================================
+       SELECCIÓN DE NORMA Y RENDERIZADO OPTIMIZADO
        ========================================================================== */
     function seleccionarLibro(norma) {
       normaActual = norma;
@@ -191,12 +260,14 @@
         lblNormaActiva.textContent = 'CCyC Ley 26.994';
         renderizarIndiceCCyC();
       } else {
-        lblNormaActiva.textContent = 'Constitución de la Nación';
+        lblNormaActiva.textContent = 'Constitución Nacional';
         renderizarIndiceCN();
       }
       
       inputBusqueda.value = '';
       btnClearSearch.style.display = 'none';
+      listaActualFiltrada = obtenerArticulosActivos();
+      limitePaginado = 40;
       renderizarVista();
     }
 
@@ -206,6 +277,7 @@
 
     function renderizarIndiceCCyC() {
       const libros = [
+        { id: 'TODOS', label: '📖 Todos los artículos' },
         { id: 'TITULO PRELIMINAR', label: 'Título Preliminar' },
         { id: 'LIBRO PRIMERO', label: 'Libro I - Parte General' },
         { id: 'LIBRO SEGUNDO', label: 'Libro II - Familia' },
@@ -221,14 +293,15 @@
 
       quickAccessBar.innerHTML = `
         <span class="qa-tag" onclick="irArticulo('1')">Art. 1</span>
-        <span class="qa-tag" onclick="irArticulo('765')">Art. 765 (Obligaciones)</span>
-        <span class="qa-tag" onclick="irArticulo('1092')">Art. 1092 (Consumo)</span>
-        <span class="qa-tag" onclick="irArticulo('1708')">Art. 1708 (Resp. Civil)</span>
+        <span class="qa-tag" onclick="irArticulo('765')">Art. 765</span>
+        <span class="qa-tag" onclick="irArticulo('1092')">Art. 1092</span>
+        <span class="qa-tag" onclick="irArticulo('1708')">Art. 1708</span>
       `;
     }
 
     function renderizarIndiceCN() {
       const partes = [
+        { id: 'TODOS', label: '📖 Constitución Completa' },
         { id: 'PREAMBULO', label: 'Preámbulo' },
         { id: 'PRIMERA PARTE', label: 'Declaraciones, Derechos y Garantías' },
         { id: 'SEGUNDA PARTE', label: 'Autoridades de la Nación' }
@@ -247,14 +320,17 @@
       `;
     }
 
-    function renderizarVista(articulos = null) {
-      const lista = articulos || obtenerArticulosActivos();
-      if (!lista || lista.length === 0) {
-        articulosContainer.innerHTML = '<p class="empty-msg">No se encontraron artículos para el criterio seleccionado.</p>';
+    // Renderizado eficiente: solo pinta en pantalla un lote a la vez para no congelar el celular
+    function renderizarVista() {
+      if (!listaActualFiltrada || listaActualFiltrada.length === 0) {
+        articulosContainer.innerHTML = '<p class="empty-msg">No se encontraron artículos.</p>';
+        btnLoadMore.style.display = 'none';
         return;
       }
 
-      articulosContainer.innerHTML = lista.map(art => `
+      const itemsVisibles = listaActualFiltrada.slice(0, limitePaginado);
+
+      articulosContainer.innerHTML = itemsVisibles.map(art => `
         <article class="article-card" id="art-${art.numero}">
           <div class="article-header">
             <span class="art-badge">Artículo ${art.numero}</span>
@@ -265,10 +341,24 @@
           </div>
         </article>
       `).join('');
+
+      // Si hay más artículos en la lista, muestra el botón para seguir cargando
+      if (listaActualFiltrada.length > limitePaginado) {
+        btnLoadMore.style.display = 'block';
+      } else {
+        btnLoadMore.style.display = 'none';
+      }
+    }
+
+    if (btnLoadMore) {
+      btnLoadMore.addEventListener('click', () => {
+        limitePaginado += 40;
+        renderizarVista();
+      });
     }
 
     /* ==========================================================================
-       FILTRADO, BÚSQUEDA Y ACCIONES RÁPIDAS
+       FILTRADO, BÚSQUEDA Y ACCIONES
        ========================================================================== */
     function irArticulo(num) {
       inputBusqueda.value = num;
@@ -277,53 +367,102 @@
 
     function filtrarPorEstructura(filtro) {
       const lista = obtenerArticulosActivos();
-      const resultado = lista.filter(a => {
-        return (a.libro && a.libro.toUpperCase().includes(filtro)) ||
-               (a.parte && a.parte.toUpperCase().includes(filtro));
-      });
-      renderizarVista(resultado.length > 0 ? resultado : lista);
+      if (filtro === 'TODOS') {
+        listaActualFiltrada = lista;
+      } else {
+        listaActualFiltrada = lista.filter(a => {
+          return (a.libro && a.libro.toUpperCase().includes(filtro)) ||
+                 (a.parte && a.parte.toUpperCase().includes(filtro));
+        });
+      }
+      limitePaginado = 40;
+      renderizarVista();
+      cerrarSidebar(); // En móvil cierra el menú al elegir
     }
 
     function ejecutarBusqueda() {
       const query = inputBusqueda.value.trim().toLowerCase();
+      const lista = obtenerArticulosActivos();
+
       if (!query) {
         btnClearSearch.style.display = 'none';
+        listaActualFiltrada = lista;
+        limitePaginado = 40;
         renderizarVista();
         return;
       }
 
       btnClearSearch.style.display = 'inline-flex';
-      const lista = obtenerArticulosActivos();
 
-      const filtrados = lista.filter(a => {
-        const matchNum = String(a.numero).toLowerCase() === query || String(a.numero).toLowerCase().startsWith(query);
+      listaActualFiltrada = lista.filter(a => {
+        const numStr = String(a.numero).toLowerCase();
+        const matchNum = numStr === query || numStr.startsWith(query);
         const matchTitulo = a.titulo ? a.titulo.toLowerCase().includes(query) : false;
         const matchTexto = (a.texto || a.contenido) ? (a.texto || a.contenido).toLowerCase().includes(query) : false;
         return matchNum || matchTitulo || matchTexto;
       });
 
-      renderizarVista(filtrados);
+      limitePaginado = 40;
+      renderizarVista();
     }
 
     /* ==========================================================================
-       EVENT LISTENERS E INICIALIZACIÓN
+       MODAL DE INSTALACIÓN
+       ========================================================================== */
+    if (btnAbrirModalInstalar) {
+      btnAbrirModalInstalar.addEventListener('click', () => {
+        modalInstalar.classList.add('active');
+      });
+    }
+
+    if (btnCloseModalInstalar) {
+      btnCloseModalInstalar.addEventListener('click', () => {
+        modalInstalar.classList.remove('active');
+      });
+    }
+
+    modalInstalar.addEventListener('click', (e) => {
+      if (e.target === modalInstalar) modalInstalar.classList.remove('active');
+    });
+
+    // Soporte PWA directo si el navegador lo permite
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstalacion = e;
+      if (btnInstalarNativoModal) {
+        btnInstalarNativoModal.style.display = 'block';
+      }
+    });
+
+    if (btnInstalarNativoModal) {
+      btnInstalarNativoModal.addEventListener('click', async () => {
+        if (!eventoInstalacion) return;
+        eventoInstalacion.prompt();
+        const { outcome } = await eventoInstalacion.userChoice;
+        if (outcome === 'accepted') {
+          modalInstalar.classList.remove('active');
+        }
+        eventoInstalacion = null;
+      });
+    }
+
+    /* ==========================================================================
+       INICIALIZACIÓN
        ========================================================================== */
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. Cargar tema
       aplicarTema(localStorage.getItem('suite_tema') || 'light');
+      
       const btnTema = document.getElementById('btnThemeToggle');
       if (btnTema) btnTema.addEventListener('click', toggleTema);
 
-      // 2. Cargar norma activa
-      const normaGuardada = localStorage.getItem('suite_norma_activa') || 'ccyc';
-      seleccionarLibro(normaGuardada);
+      if (btnMobileIndex) btnMobileIndex.addEventListener('click', abrirSidebar);
+      if (btnCloseSidebar) btnCloseSidebar.addEventListener('click', cerrarSidebar);
+      if (sidebarOverlay) sidebarOverlay.addEventListener('click', cerrarSidebar);
 
-      // 3. Select de norma
       if (selectNorma) {
         selectNorma.addEventListener('change', (e) => seleccionarLibro(e.target.value));
       }
 
-      // 4. Input de búsqueda
       if (inputBusqueda) {
         inputBusqueda.addEventListener('input', ejecutarBusqueda);
       }
@@ -332,102 +471,28 @@
         btnClearSearch.addEventListener('click', () => {
           inputBusqueda.value = '';
           btnClearSearch.style.display = 'none';
+          listaActualFiltrada = obtenerArticulosActivos();
+          limitePaginado = 40;
           renderizarVista();
         });
       }
 
-      // 5. Cargar datos
       cargarBasesDeDatos();
-
-      // 6. Menú responsive móvil
-      const btnMobile = document.getElementById('btnMobileIndex');
-      const sidebar = document.getElementById('sidebar');
-      if (btnMobile && sidebar) {
-        btnMobile.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-        });
-      }
     });
 
     /* ==========================================================================
-       GESTIÓN DE INSTALACIÓN PWA (BOTÓN NATIVO)
-       ========================================================================== */
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      eventoInstalacion = e;
-      if (btnInstalar) {
-        btnInstalar.style.display = 'inline-flex';
-      }
-    });
-
-    if (btnInstalar) {
-      btnInstalar.addEventListener('click', async () => {
-        if (!eventoInstalacion) return;
-        eventoInstalacion.prompt();
-        const { outcome } = await eventoInstalacion.userChoice;
-        console.log(`Resultado de instalación: ${outcome}`);
-        btnInstalar.style.display = 'none';
-        eventoInstalacion = null;
-      });
-    }
-
-    window.addEventListener('appinstalled', () => {
-      if (btnInstalar) btnInstalar.style.display = 'none';
-      console.log('Legal Suite instalada correctamente.');
-    });
-
-    /* ==========================================================================
-       DETECCIÓN DE DISPOSITIVO iOS Y ESTADO DE INSTALACIÓN
-       ========================================================================== */
-    function gestionarAvisoInstalacionIOS() {
-      const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const esModoApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-      const avisoDescartado = localStorage.getItem('suite_ios_banner_visto');
-
-      if (esIOS && !esModoApp && !avisoDescartado) {
-        const banner = document.getElementById('iosInstallBanner');
-        const btnCerrar = document.getElementById('btnCloseIosBanner');
-
-        if (banner) {
-          banner.style.display = 'flex';
-
-          btnCerrar.addEventListener('click', () => {
-            banner.style.display = 'none';
-            localStorage.setItem('suite_ios_banner_visto', 'true');
-          });
-        }
-      }
-    }
-
-    window.addEventListener('load', gestionarAvisoInstalacionIOS);
-
-    /* ==========================================================================
-       REGISTRO DEL SERVICE WORKER (OFFLINE)
+       SERVICE WORKER Y PROTECCIÓN
        ========================================================================== */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then((reg) => console.log('Service Worker registrado:', reg.scope))
-          .catch((err) => console.log('Error en Service Worker:', err));
+        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
       });
     }
 
-    /* ==========================================================================
-       ESCUDO DE PROTECCIÓN CONTRA INSPECCIÓN
-       ========================================================================== */
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (
-        e.keyCode === 123 || 
-        (e.ctrlKey && e.key === 'u') || 
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 's')
-      ) {
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 123 || (e.ctrlKey && (e.key === 'u' || e.key === 's')) || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
         e.preventDefault();
-        return false;
       }
     });
   </script>
