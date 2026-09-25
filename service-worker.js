@@ -1,29 +1,30 @@
-const CACHE_NAME = 'legal-suite-v1';
-const ASSETS = [
+const CACHE_NAME = 'legal-suite-cache-v2.0.0'; // Incrementar versión ante cambios mayores
+const STATIC_ASSETS = [
   './',
   './index.html',
   './styles.css',
-  './constitucion.json',
-  './articulos.json',
-  './manifest.json'
+  './manifest.json',
+  './articulos.json'
 ];
 
-// Instalación: Precarga todos los archivos esenciales
+// Instalación: descarga la nueva versión y saltea la espera de inmediato
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
 });
 
-// Activación: Limpieza de versiones antiguas de caché
+// Activación: limpia cachés antiguas automáticamente
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Eliminando caché antigua:', key);
             return caches.delete(key);
           }
         })
@@ -32,26 +33,22 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Intercepción de peticiones: Prioridad caché para uso offline instantáneo
+// Estrategia Network-First: busca siempre en internet primero para que veas los cambios al instante;
+// si no hay internet, recurre a la caché offline.
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      });
-    }).catch(() => {
-      // Fallback si no hay conexión ni caché de esa ruta específica
-      return caches.match('./index.html');
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
