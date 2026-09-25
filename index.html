@@ -2,46 +2,50 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CÓDIGO CIVIL Y COMERCIAL - República Argentina</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>LEGAL SUITE - República Argentina</title>
 
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#f0f4f9">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <!-- Versionado en la URL del CSS para romper la caché del navegador -->
-  <link rel="stylesheet" href="./styles.css?v=2.0.0">
+  <!-- Versión 5.0.0 para invalidar caché inmediatamente -->
+  <link rel="stylesheet" href="./styles.css?v=5.0.0">
 </head>
 <body data-theme="light">
 
   <div class="app-container">
-    <!-- Encabezado principal estilo cápsula -->
+    <!-- Encabezado principal -->
     <header class="main-header">
       <div class="header-brand">
         <div class="logo-box">⚖️</div>
-        <div>
-          <h1 class="main-title">CÓDIGO CIVIL Y COMERCIAL</h1>
-          <p class="subtitle">República Argentina · Ley 26.994</p>
+        <div class="header-text">
+          <h1 class="main-title" id="tituloEncabezado">CÓDIGO CIVIL Y COMERCIAL</h1>
+          <p class="subtitle" id="subtituloEncabezado">República Argentina · Ley 26.994</p>
         </div>
       </div>
 
-      <div class="header-nav">
-        <button class="nav-tab" id="btnBiblioteca">📚 Biblioteca</button>
+      <!-- Barra estilo cápsula compacta (no se desborda en móvil) -->
+      <nav class="header-nav">
+        <button class="nav-tab" id="btnAbrirBiblioteca">
+          <span>📚 Biblioteca</span>
+        </button>
         <button class="nav-tab active" id="btnBuscador">Buscador</button>
         <button class="nav-tab" id="btnLector">Lector</button>
-        <button class="btn-icon-round" id="btnInstalar" title="Instalar sin conexión">📲</button>
+        <button class="btn-icon-round btn-only-mobile" id="btnInstalar" title="Instalar sin conexión">📲</button>
         <button class="btn-icon-round" id="btnThemeToggle" title="Cambiar tema">☀️</button>
-      </div>
+      </nav>
     </header>
 
-    <!-- Contador de normativa activa -->
+    <!-- Barra de estado / cantidad de artículos -->
     <div class="counter-bar">
-      <span>Base normativa activa: <strong id="lblTotalArticulos">2579 artículos</strong></span>
+      <span>Base normativa activa: <strong id="lblTotalArticulos">Cargando...</strong></span>
+      <span id="lblFiltroActivo" class="filter-indicator"></span>
     </div>
 
-    <!-- Caja de Búsqueda Liquid Glass con accesos rápidos -->
-    <section class="search-panel">
+    <!-- Caja de Búsqueda Liquid Glass -->
+    <section class="search-panel" id="panelBuscador">
       <div class="search-panel-top">
         <span>BUSCADOR DE ARTÍCULOS</span>
         <span>Usa ⭐ para fijar tus artículos</span>
@@ -49,7 +53,7 @@
 
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="text" id="inputBusqueda" placeholder="Escribí un número (ej: 750, 1187, 1708) o término..." autocomplete="off">
+        <input type="text" id="inputBusqueda" placeholder="Escribí un número o término..." autocomplete="off">
         <button id="btnClearSearch" class="btn-clear-input" style="display: none;">✕</button>
       </div>
 
@@ -63,10 +67,10 @@
       </div>
     </section>
 
-    <!-- Contenedor de Artículos -->
+    <!-- Contenedor principal de Artículos -->
     <main class="articles-list" id="articlesList">
       <div class="loading-state" id="loadingState">
-        <p>Cargando artículos...</p>
+        <p>Cargando cuerpo normativo...</p>
       </div>
     </main>
 
@@ -75,20 +79,107 @@
     </div>
   </div>
 
-  <!-- Modal Instrucciones de Descarga / Instalación -->
+  <!-- BOTÓN FLOTANTE INFERIOR DEL MODO LECTOR (ÍNDICE / CAPÍTULOS) -->
+  <div class="floating-reader-bar" id="floatingReaderBar" style="display: none;">
+    <button class="btn-floating-index" id="btnAbrirIndice">
+      <span>📑 Índice de Capítulos</span>
+      <span class="badge-index" id="lblIndiceActual">Libro I</span>
+    </button>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 1: BIBLIOTECA (SOLO PARA ELEGIR LA LEY / CUERPO NORMATIVO)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modalBiblioteca">
+    <div class="modal-box">
+      <div class="modal-top">
+        <div class="modal-header-icon-title">
+          <span class="modal-icon">📚</span>
+          <div>
+            <h3>Biblioteca Jurídica</h3>
+            <p class="modal-desc" style="margin-bottom: 0;">Seleccioná la ley a consultar:</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseBiblioteca">✕</button>
+      </div>
+
+<div class="library-choices">
+        <!-- 1. Código Civil y Comercial -->
+        <div class="library-choice-card active" id="cardChoiceCCYC" onclick="cambiarNorma('ccyc')">
+          <div class="choice-icon">⚖️</div>
+          <div class="choice-content">
+            <span class="choice-tag">LEY 26.994</span>
+            <h4>Código Civil y Comercial</h4>
+            <p>2579 artículos · Título Preliminar y 6 Libros.</p>
+          </div>
+        </div>
+
+        <!-- 2. Constitución Nacional -->
+        <div class="library-choice-card" id="cardChoiceCN" onclick="cambiarNorma('cn')">
+          <div class="choice-icon">📜</div>
+          <div class="choice-content">
+            <span class="choice-tag">TEXTO 1994</span>
+            <h4>Constitución Nacional</h4>
+            <p>Preámbulo, 129 artículos y disposiciones transitorias.</p>
+          </div>
+        </div>
+
+        <!-- 3. Próximo Libro en Desarrollo -->
+        <div class="library-choice-card card-upcoming">
+          <div class="choice-icon">🔒</div>
+          <div class="choice-content">
+            <span class="choice-tag tag-upcoming">EN DESARROLLO</span>
+            <h4>Código Penal de la Nación</h4>
+            <p>Ley 11.179 · Próximamente disponible en Legal Suite.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: ÍNDICE DE CAPÍTULOS Y LIBROS (SE ABRE DESDE EL MODO LECTOR)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modalIndice">
+    <div class="modal-box modal-box-large">
+      <div class="modal-top">
+        <div class="modal-header-icon-title">
+          <span class="modal-icon">📑</span>
+          <div>
+            <h3 id="tituloModalIndice">Índice Temático</h3>
+            <p class="modal-desc" style="margin-bottom: 0;">Saltá directo a un libro, título o capítulo:</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseIndice">✕</button>
+      </div>
+
+      <div class="modal-scroll-area" id="indiceContainer">
+        <!-- Generado dinámicamente con JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: INSTALACIÓN OFFLINE
+       ========================================================================== -->
   <div class="modal-backdrop" id="modalInstalar">
     <div class="modal-box">
       <div class="modal-top">
-        <h3>📲 Usar Legal Suite sin Internet</h3>
+        <div class="modal-header-icon-title">
+          <span class="modal-icon">📲</span>
+          <div>
+            <h3>Instalar Legal Suite</h3>
+            <p class="modal-desc" style="margin-bottom: 0;">Para usar sin internet en cualquier momento:</p>
+          </div>
+        </div>
         <button class="modal-close" id="btnCloseModal">✕</button>
       </div>
-      <p class="modal-desc">Podés consultar todos los artículos sin conexión agregando la app a tu pantalla:</p>
-      
+
       <div class="guide-box">
         <h4>🍏 En iPhone / iPad (Safari o Brave)</h4>
         <div class="guide-step">
           <span class="num">1</span>
-          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el cuadro con la flecha hacia arriba <strong>⎋</strong>).</span>
+          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el icono <strong>⎋</strong> con la flecha hacia arriba).</span>
         </div>
         <div class="guide-step">
           <span class="num">2</span>
@@ -104,7 +195,7 @@
         <h4>🤖 En Android (Chrome / Brave)</h4>
         <div class="guide-step">
           <span class="num">1</span>
-          <span>Tocá los <strong>tres puntos verticales (⋮)</strong> arriba a la derecha.</span>
+          <span>Tocá los <strong>tres puntos (⋮)</strong> arriba a la derecha.</span>
         </div>
         <div class="guide-step">
           <span class="num">2</span>
@@ -116,9 +207,13 @@
 
   <script>
     /* ==========================================================================
-       DATOS Y ESTADO
+       ESTADO GLOBAL
        ========================================================================== */
-    let articulos = [];
+    let articulosCCyC = [];
+    let articulosCN = [];
+    let normaActiva = localStorage.getItem('suite_norma_activa') || 'ccyc';
+    let filtroEstructura = 'TODOS';
+    let modoLectorActivo = false;
     let articulosFiltrados = [];
     let limite = 25;
     let pinnedArticulos = JSON.parse(localStorage.getItem('ccyc_pinned') || '[]');
@@ -128,33 +223,266 @@
     const btnClearSearch = document.getElementById('btnClearSearch');
     const btnLoadMore = document.getElementById('btnLoadMore');
     const lblTotalArticulos = document.getElementById('lblTotalArticulos');
+    const lblFiltroActivo = document.getElementById('lblFiltroActivo');
     const pinnedContainer = document.getElementById('pinnedContainer');
     const qaEmptyText = document.getElementById('qaEmptyText');
+    const panelBuscador = document.getElementById('panelBuscador');
+    const tituloEncabezado = document.getElementById('tituloEncabezado');
+    const subtituloEncabezado = document.getElementById('subtituloEncabezado');
+
+    const btnBuscador = document.getElementById('btnBuscador');
+    const btnLector = document.getElementById('btnLector');
+    const floatingReaderBar = document.getElementById('floatingReaderBar');
+    const btnAbrirIndice = document.getElementById('btnAbrirIndice');
+    const lblIndiceActual = document.getElementById('lblIndiceActual');
+
+    // Modales
+    const modalBiblioteca = document.getElementById('modalBiblioteca');
+    const btnAbrirBiblioteca = document.getElementById('btnAbrirBiblioteca');
+    const btnCloseBiblioteca = document.getElementById('btnCloseBiblioteca');
+
+    const modalIndice = document.getElementById('modalIndice');
+    const btnCloseIndice = document.getElementById('btnCloseIndice');
+    const indiceContainer = document.getElementById('indiceContainer');
+    const tituloModalIndice = document.getElementById('tituloModalIndice');
+
+    const modalInstalar = document.getElementById('modalInstalar');
+    const btnInstalar = document.getElementById('btnInstalar');
+    const btnCloseModal = document.getElementById('btnCloseModal');
 
     /* ==========================================================================
-       CARGA DE ARCHIVOS CON PREVENCIÓN DE CACHÉ
+       LIMPIEZA DE CONSTITUCIÓN NACIONAL (SIN BASURA NI TÍTULOS REPETIDOS)
+       ========================================================================== */
+    function normalizarConstitucion(lista) {
+      return lista.filter(item => {
+        const txt = (item.texto || item.contenido || '').trim().toLowerCase();
+        if (txt.startsWith('rdénase') || txt.startsWith('ordénase')) return false;
+        return true;
+      }).map(item => {
+        let esPreambulo = false;
+        let numStr = String(item.numero || '').trim().toLowerCase();
+        let tit = (item.titulo || '').trim();
+        let txt = (item.texto || item.contenido || '').trim();
+
+        if (numStr === '0' || numStr === 'preambulo' || tit.toLowerCase().includes('preámbulo') || txt.startsWith('nos los representantes')) {
+          esPreambulo = true;
+        }
+
+        if (tit.toLowerCase() === `artículo ${numStr}` || tit.toLowerCase() === `articulo ${numStr}`) {
+          tit = '';
+        }
+
+        return {
+          ...item,
+          esPreambulo,
+          numero: esPreambulo ? 'Preámbulo' : item.numero,
+          titulo: esPreambulo ? '' : tit,
+          texto: txt,
+          parte: item.parte || (esPreambulo ? 'PREÁMBULO' : 'PRIMERA PARTE')
+        };
+      });
+    }
+
+    /* ==========================================================================
+       INICIALIZACIÓN
        ========================================================================== */
     async function inicializar() {
       try {
-        // Timestamp dinámico para no leer JSON congelado en la caché
-        const res = await fetch('./articulos.json?t=' + Date.now());
-        const data = await res.json();
-        articulos = Array.isArray(data) ? data : (data.articulos || []);
-        
-        lblTotalArticulos.textContent = `${articulos.length} artículos`;
-        document.getElementById('loadingState').style.display = 'none';
+        const [resCCyC, resCN] = await Promise.all([
+          fetch('./articulos.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('./constitucion.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).catch(() => [])
+        ]);
 
-        articulosFiltrados = articulos;
-        renderizarPins();
-        renderizarArticulos();
+        const rawCCyC = Array.isArray(resCCyC) ? resCCyC : (resCCyC.articulos || []);
+        const rawCN = Array.isArray(resCN) ? resCN : (resCN.articulos || []);
+
+        articulosCCyC = rawCCyC;
+        articulosCN = normalizarConstitucion(rawCN);
+
+        const loading = document.getElementById('loadingState');
+        if (loading) loading.style.display = 'none';
+
+        cambiarNorma(normaActiva, false);
       } catch (e) {
         articlesList.innerHTML = '<p class="loading-state">Error al cargar la base normativa.</p>';
       }
     }
 
     /* ==========================================================================
-       RENDERIZADO OPTIMIZADO
+       CAMBIO DE NORMATIVA (DESDE EL MODAL DE BIBLIOTECA)
        ========================================================================== */
+    function cambiarNorma(norma, cerrarModal = true) {
+      normaActiva = norma;
+      filtroEstructura = 'TODOS';
+      localStorage.setItem('suite_norma_activa', norma);
+
+      document.getElementById('cardChoiceCCYC').classList.toggle('active', norma === 'ccyc');
+      document.getElementById('cardChoiceCN').classList.toggle('active', norma === 'cn');
+
+      if (norma === 'ccyc') {
+        tituloEncabezado.textContent = 'CÓDIGO CIVIL Y COMERCIAL';
+        subtituloEncabezado.textContent = 'República Argentina · Ley 26.994';
+        lblIndiceActual.textContent = 'Todo el Código';
+      } else {
+        tituloEncabezado.textContent = 'CONSTITUCIÓN NACIONAL';
+        subtituloEncabezado.textContent = 'República Argentina · Publicación Oficial';
+        lblIndiceActual.textContent = 'Toda la Constitución';
+      }
+
+      inputBusqueda.value = '';
+      aplicarFiltrosYRenderizar();
+      construirIndice();
+
+      if (cerrarModal) {
+        modalBiblioteca.classList.remove('active');
+      }
+    }
+
+    /* ==========================================================================
+       CONSTRUCCIÓN DEL ÍNDICE PARA EL MODO LECTOR
+       ========================================================================== */
+    function construirIndice() {
+      indiceContainer.innerHTML = '';
+      tituloModalIndice.textContent = normaActiva === 'ccyc' ? 'Índice · Código Civil y Comercial' : 'Índice · Constitución Nacional';
+
+      if (normaActiva === 'ccyc') {
+        const estructuraCCyC = [
+          { clave: 'TODOS', titulo: '📚 Todo el Código Completo', desc: 'Ver todos los artículos en orden numérico.' },
+          { clave: 'TITULO PRELIMINAR', titulo: 'Título Preliminar', desc: 'Arts. 1 al 18 · Fuentes, interpretación y ejercicio de los derechos.' },
+          { clave: 'LIBRO PRIMERO', titulo: 'Libro I · Parte General', desc: 'Arts. 19 al 400 · Personas humanas y jurídicas, bienes y actos.' },
+          { clave: 'LIBRO SEGUNDO', titulo: 'Libro II · Relaciones de Familia', desc: 'Arts. 401 al 723 · Matrimonio, uniones convivenciales y filiación.' },
+          { clave: 'LIBRO TERCERO', titulo: 'Libro III · Derechos Personales', desc: 'Arts. 724 al 1881 · Obligaciones, contratos en general y especiales.' },
+          { clave: 'LIBRO CUARTO', titulo: 'Libro IV · Derechos Reales', desc: 'Arts. 1882 al 2276 · Posesión, dominio, propiedad horizontal e hipoteca.' },
+          { clave: 'LIBRO QUINTO', titulo: 'Libro V · Transmisión por Causa de Muerte', desc: 'Arts. 2277 al 2531 · Sucesiones, legítima hereditaria y testamentos.' },
+          { clave: 'LIBRO SEXTO', titulo: 'Libro VI · Disposiciones Comunes', desc: 'Arts. 2532 al 2671 · Prescripción, privilegios y DIP.' }
+        ];
+
+        estructuraCCyC.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'index-item-card' + (filtroEstructura === item.clave ? ' active' : '');
+          div.innerHTML = `
+            <h4>${item.titulo}</h4>
+            <p>${item.desc}</p>
+          `;
+          div.onclick = () => {
+            filtroEstructura = item.clave;
+            lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
+            aplicarFiltrosYRenderizar();
+            modalIndice.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+          indiceContainer.appendChild(div);
+        });
+      } else {
+        const estructuraCN = [
+          { clave: 'TODOS', titulo: '📜 Constitución Completa', desc: 'Texto integral sancionado y reformado en 1994.' },
+          { clave: 'PREAMBULO', titulo: 'Preámbulo', desc: 'Texto fundacional de los representantes de la Nación.' },
+          { clave: 'PRIMERA PARTE', titulo: 'Primera Parte · Declaraciones, Derechos y Garantías', desc: 'Arts. 1 al 43 · Dogmática constitucional y nuevos derechos.' },
+          { clave: 'SEGUNDA PARTE', titulo: 'Segunda Parte · Autoridades de la Nación', desc: 'Arts. 44 al 129 · Poder Legislativo, Ejecutivo, Judicial y Gobiernos de Provincia.' }
+        ];
+
+        estructuraCN.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'index-item-card' + (filtroEstructura === item.clave ? ' active' : '');
+          div.innerHTML = `
+            <h4>${item.titulo}</h4>
+            <p>${item.desc}</p>
+          `;
+          div.onclick = () => {
+            filtroEstructura = item.clave;
+            lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
+            aplicarFiltrosYRenderizar();
+            modalIndice.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+          indiceContainer.appendChild(div);
+        });
+      }
+    }
+
+    /* ==========================================================================
+       MODO LECTOR VS BUSCADOR
+       ========================================================================== */
+    btnBuscador.addEventListener('click', () => {
+      modoLectorActivo = false;
+      btnBuscador.classList.add('active');
+      btnLector.classList.remove('active');
+      panelBuscador.style.display = 'block';
+      floatingReaderBar.style.display = 'none';
+      renderizarArticulos();
+    });
+
+    btnLector.addEventListener('click', () => {
+      modoLectorActivo = true;
+      btnLector.classList.add('active');
+      btnBuscador.classList.remove('active');
+      panelBuscador.style.display = 'none';
+      floatingReaderBar.style.display = 'flex';
+      renderizarArticulos();
+    });
+
+    btnAbrirIndice.addEventListener('click', () => {
+      construirIndice();
+      modalIndice.classList.add('active');
+    });
+
+    btnCloseIndice.addEventListener('click', () => modalIndice.classList.remove('active'));
+    modalIndice.addEventListener('click', (e) => {
+      if (e.target === modalIndice) modalIndice.classList.remove('active');
+    });
+
+    btnAbrirBiblioteca.addEventListener('click', () => modalBiblioteca.classList.add('active'));
+    btnCloseBiblioteca.addEventListener('click', () => modalBiblioteca.classList.remove('active'));
+    modalBiblioteca.addEventListener('click', (e) => {
+      if (e.target === modalBiblioteca) modalBiblioteca.classList.remove('active');
+    });
+
+    /* ==========================================================================
+       FILTROS Y RENDERIZADO
+       ========================================================================== */
+    function aplicarFiltrosYRenderizar() {
+      const base = normaActiva === 'ccyc' ? articulosCCyC : articulosCN;
+      const query = inputBusqueda.value.trim().toLowerCase();
+
+      let resultado = base;
+      if (filtroEstructura !== 'TODOS') {
+        resultado = base.filter(a => {
+          if (normaActiva === 'cn' && filtroEstructura === 'PREAMBULO') {
+            return a.esPreambulo;
+          }
+          const lib = (a.libro || '').toUpperCase();
+          const prt = (a.parte || '').toUpperCase();
+          return lib.includes(filtroEstructura) || prt.includes(filtroEstructura);
+        });
+      }
+
+      if (query) {
+        btnClearSearch.style.display = 'block';
+        resultado = resultado.filter(a => {
+          const num = String(a.numero).toLowerCase();
+          const matchNum = num === query || num.startsWith(query);
+          const matchTitulo = a.titulo && a.titulo.toLowerCase().includes(query);
+          const matchTexto = (a.texto || '').toLowerCase().includes(query);
+          return matchNum || matchTitulo || matchTexto;
+        });
+      } else {
+        btnClearSearch.style.display = 'none';
+      }
+
+      articulosFiltrados = resultado;
+      lblTotalArticulos.textContent = `${resultado.length} artículos`;
+      
+      if (filtroEstructura !== 'TODOS') {
+        lblFiltroActivo.textContent = `(Filtrado por: ${filtroEstructura})`;
+      } else {
+        lblFiltroActivo.textContent = '';
+      }
+
+      limite = 25;
+      renderizarPins();
+      renderizarArticulos();
+    }
+
     function renderizarArticulos() {
       if (articulosFiltrados.length === 0) {
         articlesList.innerHTML = '<p class="loading-state">No se encontraron artículos.</p>';
@@ -166,16 +494,25 @@
 
       articlesList.innerHTML = lista.map(art => {
         const esFijado = pinnedArticulos.includes(String(art.numero));
-        const texto = art.texto || art.contenido || '';
-        const esLargo = texto.length > 280;
+        const texto = art.texto || '';
+        const truncar = !modoLectorActivo && texto.length > 280;
+
+        let encabezado = '';
+        if (art.esPreambulo) {
+          encabezado = 'PREÁMBULO';
+        } else {
+          encabezado = `ARTÍCULO ${art.numero}° ${art.titulo ? '- ' + art.titulo : ''}`;
+        }
+
+        const tagSeccion = (art.libro || art.parte || (art.esPreambulo ? 'PREÁMBULO' : 'NORMATIVA')).toUpperCase();
 
         return `
           <article class="art-card" id="card-${art.numero}">
             <div class="art-card-header">
               <div>
-                <span class="art-badge-tag">${(art.libro || 'TÍTULO PRELIMINAR').toUpperCase()}</span>
-                <h2 class="art-card-title">ARTÍCULO ${art.numero}° - ${art.titulo || ''}</h2>
-                <span class="art-card-sub">Código Civil y Comercial de la Nación</span>
+                <span class="art-badge-tag">${tagSeccion}</span>
+                <h2 class="art-card-title">${encabezado}</h2>
+                <span class="art-card-sub">${normaActiva === 'ccyc' ? 'Código Civil y Comercial de la Nación' : 'Constitución de la Nación Argentina'}</span>
               </div>
               <div class="art-actions">
                 <button class="btn-action ${esFijado ? 'active' : ''}" onclick="togglePin('${art.numero}')">
@@ -188,11 +525,11 @@
               </div>
             </div>
 
-            <div class="art-card-body-wrapper ${esLargo ? 'truncated' : ''}" id="wrap-${art.numero}">
+            <div class="art-card-body-wrapper ${truncar ? 'truncated' : ''}" id="wrap-${art.numero}">
               <p class="art-card-body">${texto}</p>
             </div>
 
-            ${esLargo ? `
+            ${truncar ? `
               <button class="btn-expand" id="btn-exp-${art.numero}" onclick="expandirTexto('${art.numero}')">
                 ▼ Leer artículo completo
               </button>
@@ -219,37 +556,17 @@
     }
 
     /* ==========================================================================
-       BÚSQUEDA
+       BUSCADOR
        ========================================================================== */
-    inputBusqueda.addEventListener('input', () => {
-      const val = inputBusqueda.value.trim().toLowerCase();
-      if (!val) {
-        btnClearSearch.style.display = 'none';
-        articulosFiltrados = articulos;
-      } else {
-        btnClearSearch.style.display = 'block';
-        articulosFiltrados = articulos.filter(a => {
-          const num = String(a.numero).toLowerCase();
-          const matchNum = num === val || num.startsWith(val);
-          const matchTitulo = a.titulo && a.titulo.toLowerCase().includes(val);
-          const matchTexto = (a.texto || a.contenido || '').toLowerCase().includes(val);
-          return matchNum || matchTitulo || matchTexto;
-        });
-      }
-      limite = 25;
-      renderizarArticulos();
-    });
+    inputBusqueda.addEventListener('input', aplicarFiltrosYRenderizar);
 
     btnClearSearch.addEventListener('click', () => {
       inputBusqueda.value = '';
-      btnClearSearch.style.display = 'none';
-      articulosFiltrados = articulos;
-      limite = 25;
-      renderizarArticulos();
+      aplicarFiltrosYRenderizar();
     });
 
     /* ==========================================================================
-       PINS / ACCESOS RÁPIDOS
+       PINS (ACCESOS RÁPIDOS)
        ========================================================================== */
     function togglePin(num) {
       const str = String(num);
@@ -274,7 +591,7 @@
       qaEmptyText.style.display = 'none';
       pinnedContainer.style.display = 'flex';
       pinnedContainer.innerHTML = pinnedArticulos.map(num => `
-        <span class="qa-badge" onclick="irArticulo('${num}')">Art. ${num}</span>
+        <span class="qa-badge" onclick="irArticulo('${num}')">${num === 'Preámbulo' ? 'Preámbulo' : 'Art. ' + num}</span>
       `).join('');
     }
 
@@ -286,30 +603,33 @@
     });
 
     function irArticulo(num) {
-      inputBusqueda.value = num;
-      inputBusqueda.dispatchEvent(new Event('input'));
+      if (modoLectorActivo) {
+        btnBuscador.click();
+      }
+      inputBusqueda.value = num === 'Preámbulo' ? 'Preámbulo' : num;
+      aplicarFiltrosYRenderizar();
     }
 
     /* ==========================================================================
-       ACCIONES (COPIAR & WHATSAPP)
+       COPIAR Y COMPARTIR
        ========================================================================== */
     function copiarArticulo(num) {
-      const art = articulos.find(a => String(a.numero) === String(num));
+      const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
-      const texto = `ARTÍCULO ${art.numero}° - ${art.titulo || ''}\n\n${art.texto || art.contenido}\n(Código Civil y Comercial de la Nación)`;
+      const texto = `${art.esPreambulo ? 'PREÁMBULO' : 'ARTÍCULO ' + art.numero + '° ' + (art.titulo ? '- ' + art.titulo : '')}\n\n${art.texto}\n(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})`;
       navigator.clipboard.writeText(texto);
-      alert(`Artículo ${num} copiado al portapapeles.`);
+      alert('Artículo copiado al portapapeles.');
     }
 
     function compartirWhatsapp(num) {
-      const art = articulos.find(a => String(a.numero) === String(num));
+      const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
-      const texto = `*ARTÍCULO ${art.numero}° - ${art.titulo || ''}*\n\n${art.texto || art.contenido}\n\n_(CCyC de la Nación)_`;
+      const texto = `*${art.esPreambulo ? 'PREÁMBULO' : 'ARTÍCULO ' + art.numero + '° ' + (art.titulo ? '- ' + art.titulo : '')}*\n\n${art.texto}\n\n_(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})_`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
     /* ==========================================================================
-       TEMAS
+       TEMA CLARO / OSCURO
        ========================================================================== */
     const btnTheme = document.getElementById('btnThemeToggle');
     const temaGuardado = localStorage.getItem('ccyc_theme') || 'light';
@@ -327,36 +647,28 @@
     /* ==========================================================================
        MODAL DE INSTALACIÓN
        ========================================================================== */
-    const modalInstalar = document.getElementById('modalInstalar');
-    document.getElementById('btnInstalar').addEventListener('click', () => {
-      modalInstalar.classList.add('active');
-    });
-    document.getElementById('btnCloseModal').addEventListener('click', () => {
-      modalInstalar.classList.remove('active');
-    });
+    btnInstalar.addEventListener('click', () => modalInstalar.classList.add('active'));
+    btnCloseModal.addEventListener('click', () => modalInstalar.classList.remove('active'));
     modalInstalar.addEventListener('click', (e) => {
       if (e.target === modalInstalar) modalInstalar.classList.remove('active');
     });
 
     /* ==========================================================================
-       SISTEMA DE ACTUALIZACIÓN AUTOMÁTICA DEL SERVICE WORKER
+       SERVICE WORKER
        ========================================================================== */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').then((registration) => {
-          // Si hay una actualización lista esperando, fuerza el recambio
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Se detectó código nuevo: recarga para mostrar la última versión
                 window.location.reload();
               }
             });
           });
         }).catch(() => {});
 
-        // Recarga cuando el Service Worker toma el control con nuevos assets
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (!refreshing) {
@@ -368,7 +680,7 @@
     }
 
     /* ==========================================================================
-       ESCUDO DE PROTECCIÓN CONTRA INSPECCIÓN
+       ESCUDO ANTI-INSPECCIÓN
        ========================================================================== */
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
