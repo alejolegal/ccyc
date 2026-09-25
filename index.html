@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
   <title>Legal Suite - Edición Digital Universitaria</title>
   <link rel="stylesheet" href="styles.css?v=suite-fase3-expand">
 </head>
@@ -674,6 +676,15 @@
       const btnMobile = document.getElementById('btnMobileIndex');
       if (btnMobile) btnMobile.style.display = 'none';
     });
+
+    // Registro del Service Worker para funcionamiento Offline / PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then((reg) => console.log('Service Worker registrado:', reg.scope))
+      .catch((err) => console.log('Error en Service Worker:', err));
+  });
+}
 
     // Protección básica contra inspección directa
     document.addEventListener('contextmenu', function(e) {
