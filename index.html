@@ -10,8 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <!-- Versión 5.0.0 para invalidar caché inmediatamente -->
-  <link rel="stylesheet" href="./styles.css?v=5.0.0">
+  <!-- Versionado 5.1.0 para forzar actualización de caché -->
+  <link rel="stylesheet" href="./styles.css?v=5.1.0">
 </head>
 <body data-theme="light">
 
@@ -26,7 +26,6 @@
         </div>
       </div>
 
-      <!-- Barra estilo cápsula compacta (no se desborda en móvil) -->
       <nav class="header-nav">
         <button class="nav-tab" id="btnAbrirBiblioteca">
           <span>📚 Biblioteca</span>
@@ -38,13 +37,13 @@
       </nav>
     </header>
 
-    <!-- Barra de estado / cantidad de artículos -->
+    <!-- Barra de estado -->
     <div class="counter-bar">
       <span>Base normativa activa: <strong id="lblTotalArticulos">Cargando...</strong></span>
       <span id="lblFiltroActivo" class="filter-indicator"></span>
     </div>
 
-    <!-- Caja de Búsqueda Liquid Glass -->
+    <!-- Caja de Búsqueda -->
     <section class="search-panel" id="panelBuscador">
       <div class="search-panel-top">
         <span>BUSCADOR DE ARTÍCULOS</span>
@@ -79,7 +78,7 @@
     </div>
   </div>
 
-  <!-- BOTÓN FLOTANTE INFERIOR DEL MODO LECTOR (ÍNDICE / CAPÍTULOS) -->
+  <!-- BOTÓN FLOTANTE INFERIOR DEL MODO LECTOR -->
   <div class="floating-reader-bar" id="floatingReaderBar" style="display: none;">
     <button class="btn-floating-index" id="btnAbrirIndice">
       <span>📑 Índice de Capítulos</span>
@@ -87,9 +86,7 @@
     </button>
   </div>
 
-  <!-- ==========================================================================
-       MODAL 1: BIBLIOTECA (SOLO PARA ELEGIR LA LEY / CUERPO NORMATIVO)
-       ========================================================================== -->
+  <!-- MODAL BIBLIOTECA -->
   <div class="modal-backdrop" id="modalBiblioteca">
     <div class="modal-box">
       <div class="modal-top">
@@ -103,7 +100,7 @@
         <button class="modal-close" id="btnCloseBiblioteca">✕</button>
       </div>
 
-<div class="library-choices">
+      <div class="library-choices">
         <!-- 1. Código Civil y Comercial -->
         <div class="library-choice-card active" id="cardChoiceCCYC" onclick="cambiarNorma('ccyc')">
           <div class="choice-icon">⚖️</div>
@@ -137,9 +134,7 @@
     </div>
   </div>
 
-  <!-- ==========================================================================
-       MODAL 2: ÍNDICE DE CAPÍTULOS Y LIBROS (SE ABRE DESDE EL MODO LECTOR)
-       ========================================================================== -->
+  <!-- MODAL ÍNDICE (MODO LECTOR) -->
   <div class="modal-backdrop" id="modalIndice">
     <div class="modal-box modal-box-large">
       <div class="modal-top">
@@ -153,15 +148,11 @@
         <button class="modal-close" id="btnCloseIndice">✕</button>
       </div>
 
-      <div class="modal-scroll-area" id="indiceContainer">
-        <!-- Generado dinámicamente con JavaScript -->
-      </div>
+      <div class="modal-scroll-area" id="indiceContainer"></div>
     </div>
   </div>
 
-  <!-- ==========================================================================
-       MODAL 3: INSTALACIÓN OFFLINE
-       ========================================================================== -->
+  <!-- MODAL INSTALACIÓN OFFLINE -->
   <div class="modal-backdrop" id="modalInstalar">
     <div class="modal-box">
       <div class="modal-top">
@@ -236,7 +227,6 @@
     const btnAbrirIndice = document.getElementById('btnAbrirIndice');
     const lblIndiceActual = document.getElementById('lblIndiceActual');
 
-    // Modales
     const modalBiblioteca = document.getElementById('modalBiblioteca');
     const btnAbrirBiblioteca = document.getElementById('btnAbrirBiblioteca');
     const btnCloseBiblioteca = document.getElementById('btnCloseBiblioteca');
@@ -251,7 +241,7 @@
     const btnCloseModal = document.getElementById('btnCloseModal');
 
     /* ==========================================================================
-       LIMPIEZA DE CONSTITUCIÓN NACIONAL (SIN BASURA NI TÍTULOS REPETIDOS)
+       LIMPIEZA DE CONSTITUCIÓN NACIONAL (CORRECCIÓN ARTÍCULO 14 BIS)
        ========================================================================== */
     function normalizarConstitucion(lista) {
       return lista.filter(item => {
@@ -260,22 +250,31 @@
         return true;
       }).map(item => {
         let esPreambulo = false;
-        let numStr = String(item.numero || '').trim().toLowerCase();
+        let numStr = String(item.numero || '').trim();
         let tit = (item.titulo || '').trim();
         let txt = (item.texto || item.contenido || '').trim();
 
-        if (numStr === '0' || numStr === 'preambulo' || tit.toLowerCase().includes('preámbulo') || txt.startsWith('nos los representantes')) {
+        // Limpieza específica para el Artículo 14 bis (quita el "5" o números extra)
+        if (
+          (numStr.toLowerCase().includes('14') && (numStr.toLowerCase().includes('bis') || tit.toLowerCase().includes('bis'))) ||
+          txt.toLowerCase().startsWith('el trabajo en sus diversas formas')
+        ) {
+          numStr = '14 bis';
+          tit = '';
+        }
+
+        if (numStr === '0' || numStr.toLowerCase() === 'preambulo' || tit.toLowerCase().includes('preámbulo') || txt.toLowerCase().startsWith('nos los representantes')) {
           esPreambulo = true;
         }
 
-        if (tit.toLowerCase() === `artículo ${numStr}` || tit.toLowerCase() === `articulo ${numStr}`) {
+        if (tit.toLowerCase() === `artículo ${numStr.toLowerCase()}` || tit.toLowerCase() === `articulo ${numStr.toLowerCase()}` || tit.toLowerCase() === numStr.toLowerCase()) {
           tit = '';
         }
 
         return {
           ...item,
           esPreambulo,
-          numero: esPreambulo ? 'Preámbulo' : item.numero,
+          numero: esPreambulo ? 'Preámbulo' : numStr,
           titulo: esPreambulo ? '' : tit,
           texto: txt,
           parte: item.parte || (esPreambulo ? 'PREÁMBULO' : 'PRIMERA PARTE')
@@ -309,7 +308,7 @@
     }
 
     /* ==========================================================================
-       CAMBIO DE NORMATIVA (DESDE EL MODAL DE BIBLIOTECA)
+       CAMBIO DE NORMATIVA
        ========================================================================== */
     function cambiarNorma(norma, cerrarModal = true) {
       normaActiva = norma;
@@ -339,7 +338,7 @@
     }
 
     /* ==========================================================================
-       CONSTRUCCIÓN DEL ÍNDICE PARA EL MODO LECTOR
+       CONSTRUCCIÓN DEL ÍNDICE
        ========================================================================== */
     function construirIndice() {
       indiceContainer.innerHTML = '';
@@ -378,7 +377,7 @@
           { clave: 'TODOS', titulo: '📜 Constitución Completa', desc: 'Texto integral sancionado y reformado en 1994.' },
           { clave: 'PREAMBULO', titulo: 'Preámbulo', desc: 'Texto fundacional de los representantes de la Nación.' },
           { clave: 'PRIMERA PARTE', titulo: 'Primera Parte · Declaraciones, Derechos y Garantías', desc: 'Arts. 1 al 43 · Dogmática constitucional y nuevos derechos.' },
-          { clave: 'SEGUNDA PARTE', titulo: 'Segunda Parte · Autoridades de la Nación', desc: 'Arts. 44 al 129 · Poder Legislativo, Ejecutivo, Judicial y Gobiernos de Provincia.' }
+          { clave: 'SEGUNDA PARTE', titulo: 'Segunda Parte · Autoridades de la Nación', desc: 'Arts. 44 al 129 · Poder Legislativo, Ejecutivo, Judicial y Provincias.' }
         ];
 
         estructuraCN.forEach(item => {
@@ -500,8 +499,11 @@
         let encabezado = '';
         if (art.esPreambulo) {
           encabezado = 'PREÁMBULO';
+        } else if (String(art.numero).toLowerCase().includes('bis')) {
+          // Formato limpio para el Artículo 14 bis (sin el símbolo °)
+          encabezado = `ARTÍCULO ${art.numero} ${art.titulo ? '- ' + art.titulo : ''}`.trim();
         } else {
-          encabezado = `ARTÍCULO ${art.numero}° ${art.titulo ? '- ' + art.titulo : ''}`;
+          encabezado = `ARTÍCULO ${art.numero}° ${art.titulo ? '- ' + art.titulo : ''}`.trim();
         }
 
         const tagSeccion = (art.libro || art.parte || (art.esPreambulo ? 'PREÁMBULO' : 'NORMATIVA')).toUpperCase();
@@ -616,7 +618,8 @@
     function copiarArticulo(num) {
       const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
-      const texto = `${art.esPreambulo ? 'PREÁMBULO' : 'ARTÍCULO ' + art.numero + '° ' + (art.titulo ? '- ' + art.titulo : '')}\n\n${art.texto}\n(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})`;
+      const encabezado = art.esPreambulo ? 'PREÁMBULO' : (String(art.numero).toLowerCase().includes('bis') ? `ARTÍCULO ${art.numero}` : `ARTÍCULO ${art.numero}°`);
+      const texto = `${encabezado} ${art.titulo ? '- ' + art.titulo : ''}\n\n${art.texto}\n(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})`;
       navigator.clipboard.writeText(texto);
       alert('Artículo copiado al portapapeles.');
     }
@@ -624,7 +627,8 @@
     function compartirWhatsapp(num) {
       const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
-      const texto = `*${art.esPreambulo ? 'PREÁMBULO' : 'ARTÍCULO ' + art.numero + '° ' + (art.titulo ? '- ' + art.titulo : '')}*\n\n${art.texto}\n\n_(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})_`;
+      const encabezado = art.esPreambulo ? 'PREÁMBULO' : (String(art.numero).toLowerCase().includes('bis') ? `ARTÍCULO ${art.numero}` : `ARTÍCULO ${art.numero}°`);
+      const texto = `*${encabezado} ${art.titulo ? '- ' + art.titulo : ''}*\n\n${art.texto}\n\n_(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})_`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
