@@ -1247,3 +1247,57 @@ mark.hl-match {
   line-height: 1.65;
   margin: 0;
 }
+
+/* ==========================================
+   ESTILOS Y ADAPTACIÓN DEL BOTÓN DE WHATSAPP
+   ========================================== */
+.wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 211, 102, 0.1);
+  color: #128c7e;
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.wa-btn:hover {
+  background: rgba(37, 211, 102, 0.22);
+  border-color: #25d366;
+  transform: translateY(-1px);
+}
+
+/* Modo Nocturno / Dark Mode */
+[data-theme="dark"] .wa-btn {
+  background: rgba(37, 211, 102, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  box-shadow: 0 0 10px rgba(37, 211, 102, 0.05);
+}
+
+[data-theme="dark"] .wa-btn:hover {
+  background: rgba(37, 211, 102, 0.25);
+  border-color: #4ade80;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.25);
+}
+
+/* Modo Lectura / Sepia */
+[data-theme="sepia"] .wa-btn {
+  background: rgba(46, 125, 50, 0.08);
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.25);
+}
+
+[data-theme="sepia"] .wa-btn:hover {
+  background: rgba(46, 125, 50, 0.18);
+  border-color: #2e7d32;
+  color: #1b5e20;
+}
