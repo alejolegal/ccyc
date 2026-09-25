@@ -98,24 +98,23 @@
   </div>
 
   <!-- Banner explicativo exclusivo para iPhone / iOS -->
-<div id="iosInstallBanner" class="ios-install-banner" style="display: none;">
-  <div class="ios-banner-header">
-    <h4>⚖️ Instalar en tu iPhone</h4>
-    <button id="btnCloseIosBanner" class="ios-banner-close" aria-label="Cerrar">✕</button>
-  </div>
-  <div class="ios-banner-body">
-    <p>Usá la app a pantalla completa y sin internet:</p>
-    <div class="ios-step">
-      <span class="ios-step-icon">1</span>
-      <span>Tocá el botón <strong>Compartir</strong> en la barra inferior (⎋).</span>
+  <div id="iosInstallBanner" class="ios-install-banner" style="display: none;">
+    <div class="ios-banner-header">
+      <h4>⚖️ Instalar en tu iPhone</h4>
+      <button id="btnCloseIosBanner" class="ios-banner-close" aria-label="Cerrar">✕</button>
     </div>
-    <div class="ios-step">
-      <span class="ios-step-icon">2</span>
-      <span>Seleccioná <strong>"Agregar a inicio"</strong> (➕).</span>
+    <div class="ios-banner-body">
+      <p>Usá la app a pantalla completa y sin internet:</p>
+      <div class="ios-step">
+        <span class="ios-step-icon">1</span>
+        <span>Tocá el botón <strong>Compartir</strong> en la barra inferior (⎋).</span>
+      </div>
+      <div class="ios-step">
+        <span class="ios-step-icon">2</span>
+        <span>Seleccioná <strong>"Agregar a inicio"</strong> (➕).</span>
+      </div>
     </div>
   </div>
-</div>
-
 
   <script>
     /* ==========================================================================
@@ -140,15 +139,22 @@
        ========================================================================== */
     async function cargarBasesDeDatos() {
       try {
-        const [resCCyC, resCN] = await Promise.all([
-          fetch('./articulos.json').then(r => r.json()).catch(() => []),
-          fetch('./constitucion.json').then(r => r.json()).catch(() => [])
-        ]);
-        
-        articulosCCyC = resCCyC;
-        articulosCN = resCN;
+        const fetchCCyC = fetch('./articulos.json')
+          .then(r => r.ok ? r.json() : [])
+          .catch(() => []);
 
-        document.getElementById('loadingState').style.display = 'none';
+        const fetchCN = fetch('./constitucion.json')
+          .then(r => r.ok ? r.json() : [])
+          .catch(() => []);
+
+        const [resCCyC, resCN] = await Promise.all([fetchCCyC, fetchCN]);
+
+        articulosCCyC = Array.isArray(resCCyC) ? resCCyC : (resCCyC.articulos || []);
+        articulosCN = Array.isArray(resCN) ? resCN : (resCN.articulos || []);
+
+        const loading = document.getElementById('loadingState');
+        if (loading) loading.style.display = 'none';
+
         renderizarVista();
       } catch (error) {
         console.error('Error al cargar normativas:', error);
@@ -332,6 +338,15 @@
 
       // 5. Cargar datos
       cargarBasesDeDatos();
+
+      // 6. Menú responsive móvil
+      const btnMobile = document.getElementById('btnMobileIndex');
+      const sidebar = document.getElementById('sidebar');
+      if (btnMobile && sidebar) {
+        btnMobile.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+        });
+      }
     });
 
     /* ==========================================================================
@@ -362,6 +377,31 @@
     });
 
     /* ==========================================================================
+       DETECCIÓN DE DISPOSITIVO iOS Y ESTADO DE INSTALACIÓN
+       ========================================================================== */
+    function gestionarAvisoInstalacionIOS() {
+      const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const esModoApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+      const avisoDescartado = localStorage.getItem('suite_ios_banner_visto');
+
+      if (esIOS && !esModoApp && !avisoDescartado) {
+        const banner = document.getElementById('iosInstallBanner');
+        const btnCerrar = document.getElementById('btnCloseIosBanner');
+
+        if (banner) {
+          banner.style.display = 'flex';
+
+          btnCerrar.addEventListener('click', () => {
+            banner.style.display = 'none';
+            localStorage.setItem('suite_ios_banner_visto', 'true');
+          });
+        }
+      }
+    }
+
+    window.addEventListener('load', gestionarAvisoInstalacionIOS);
+
+    /* ==========================================================================
        REGISTRO DEL SERVICE WORKER (OFFLINE)
        ========================================================================== */
     if ('serviceWorker' in navigator) {
@@ -371,31 +411,6 @@
           .catch((err) => console.log('Error en Service Worker:', err));
       });
     }
-
-    // Detección de dispositivo iOS y estado de instalación
-function gestionarAvisoInstalacionIOS() {
-  const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const esModoApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  const avisoDescartado = localStorage.getItem('suite_ios_banner_visto');
-
-  // Solo se muestra si está en un iPhone/iPad, usando el navegador web y no lo cerró antes
-  if (esIOS && !esModoApp && !avisoDescartado) {
-    const banner = document.getElementById('iosInstallBanner');
-    const btnCerrar = document.getElementById('btnCloseIosBanner');
-
-    if (banner) {
-      banner.style.display = 'flex';
-
-      btnCerrar.addEventListener('click', () => {
-        banner.style.display = 'none';
-        localStorage.setItem('suite_ios_banner_visto', 'true');
-      });
-    }
-  }
-}
-
-// Ejecutar la verificación al cargar
-window.addEventListener('load', gestionarAvisoInstalacionIOS);
 
     /* ==========================================================================
        ESCUDO DE PROTECCIÓN CONTRA INSPECCIÓN
