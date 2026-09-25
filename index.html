@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +10,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <link rel="stylesheet" href="./styles.css">
+  <!-- Versionado en la URL del CSS para romper la caché del navegador -->
+  <link rel="stylesheet" href="./styles.css?v=2.0.0">
 </head>
-
 <body data-theme="light">
 
   <div class="app-container">
-<!-- Encabezado principal -->
+    <!-- Encabezado principal estilo cápsula -->
     <header class="main-header">
       <div class="header-brand">
         <div class="logo-box">⚖️</div>
@@ -50,8 +49,7 @@
 
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="text" id="inputBusqueda" placeholder="Escribí un número (ej: 750, 1187, 1708) o término..."
-          autocomplete="off">
+        <input type="text" id="inputBusqueda" placeholder="Escribí un número (ej: 750, 1187, 1708) o término..." autocomplete="off">
         <button id="btnClearSearch" class="btn-clear-input" style="display: none;">✕</button>
       </div>
 
@@ -60,8 +58,7 @@
           <span class="qa-title">MIS ACCESOS RÁPIDOS:</span>
           <button class="btn-reset" id="btnResetPins">Restablecer</button>
         </div>
-        <p class="qa-empty-text" id="qaEmptyText">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.
-        </p>
+        <p class="qa-empty-text" id="qaEmptyText">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.</p>
         <div class="pinned-container" id="pinnedContainer" style="display: none;"></div>
       </div>
     </section>
@@ -86,13 +83,12 @@
         <button class="modal-close" id="btnCloseModal">✕</button>
       </div>
       <p class="modal-desc">Podés consultar todos los artículos sin conexión agregando la app a tu pantalla:</p>
-
+      
       <div class="guide-box">
         <h4>🍏 En iPhone / iPad (Safari o Brave)</h4>
         <div class="guide-step">
           <span class="num">1</span>
-          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el cuadro con la flecha hacia arriba
-            <strong>⎋</strong>).</span>
+          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el cuadro con la flecha hacia arriba <strong>⎋</strong>).</span>
         </div>
         <div class="guide-step">
           <span class="num">2</span>
@@ -112,8 +108,7 @@
         </div>
         <div class="guide-step">
           <span class="num">2</span>
-          <span>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla
-              principal"</strong>.</span>
+          <span>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</span>
         </div>
       </div>
     </div>
@@ -125,7 +120,7 @@
        ========================================================================== */
     let articulos = [];
     let articulosFiltrados = [];
-    let limite = 25; // Límite fluido que evita que se cuelgue en móviles
+    let limite = 25;
     let pinnedArticulos = JSON.parse(localStorage.getItem('ccyc_pinned') || '[]');
 
     const articlesList = document.getElementById('articlesList');
@@ -137,14 +132,15 @@
     const qaEmptyText = document.getElementById('qaEmptyText');
 
     /* ==========================================================================
-       CARGA DE ARCHIVO
+       CARGA DE ARCHIVOS CON PREVENCIÓN DE CACHÉ
        ========================================================================== */
     async function inicializar() {
       try {
-        const res = await fetch('./articulos.json');
+        // Timestamp dinámico para no leer JSON congelado en la caché
+        const res = await fetch('./articulos.json?t=' + Date.now());
         const data = await res.json();
         articulos = Array.isArray(data) ? data : (data.articulos || []);
-
+        
         lblTotalArticulos.textContent = `${articulos.length} artículos`;
         document.getElementById('loadingState').style.display = 'none';
 
@@ -157,7 +153,7 @@
     }
 
     /* ==========================================================================
-       RENDERIZADO CON EFECTO DE DESVANECIDO
+       RENDERIZADO OPTIMIZADO
        ========================================================================== */
     function renderizarArticulos() {
       if (articulosFiltrados.length === 0) {
@@ -223,7 +219,7 @@
     }
 
     /* ==========================================================================
-       BÚSQUEDA FLUIDA
+       BÚSQUEDA
        ========================================================================== */
     inputBusqueda.addEventListener('input', () => {
       const val = inputBusqueda.value.trim().toLowerCase();
@@ -313,7 +309,7 @@
     }
 
     /* ==========================================================================
-       TEMAS (LUZ / OSCURO)
+       TEMAS
        ========================================================================== */
     const btnTheme = document.getElementById('btnThemeToggle');
     const temaGuardado = localStorage.getItem('ccyc_theme') || 'light';
@@ -343,11 +339,31 @@
     });
 
     /* ==========================================================================
-       SERVICE WORKER (OFFLINE)
+       SISTEMA DE ACTUALIZACIÓN AUTOMÁTICA DEL SERVICE WORKER
        ========================================================================== */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(() => { });
+        navigator.serviceWorker.register('./service-worker.js').then((registration) => {
+          // Si hay una actualización lista esperando, fuerza el recambio
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Se detectó código nuevo: recarga para mostrar la última versión
+                window.location.reload();
+              }
+            });
+          });
+        }).catch(() => {});
+
+        // Recarga cuando el Service Worker toma el control con nuevos assets
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
       });
     }
 
@@ -357,8 +373,8 @@
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if (
-        e.keyCode === 123 ||
-        (e.ctrlKey && (e.key === 'u' || e.key === 's')) ||
+        e.keyCode === 123 || 
+        (e.ctrlKey && (e.key === 'u' || e.key === 's')) || 
         (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))
       ) {
         e.preventDefault();
@@ -369,5 +385,4 @@
     window.addEventListener('DOMContentLoaded', inicializar);
   </script>
 </body>
-
 </html>
