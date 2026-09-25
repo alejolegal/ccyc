@@ -674,6 +674,24 @@
       const btnMobile = document.getElementById('btnMobileIndex');
       if (btnMobile) btnMobile.style.display = 'none';
     });
+
+    // Protección básica contra inspección directa
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.keyCode === 123 || 
+        (e.ctrlKey && e.key === 'u') || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 's')
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
   </script>
 </body>
 </html>
