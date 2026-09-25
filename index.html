@@ -97,6 +97,26 @@
 
   </div>
 
+  <!-- Banner explicativo exclusivo para iPhone / iOS -->
+<div id="iosInstallBanner" class="ios-install-banner" style="display: none;">
+  <div class="ios-banner-header">
+    <h4>⚖️ Instalar en tu iPhone</h4>
+    <button id="btnCloseIosBanner" class="ios-banner-close" aria-label="Cerrar">✕</button>
+  </div>
+  <div class="ios-banner-body">
+    <p>Usá la app a pantalla completa y sin internet:</p>
+    <div class="ios-step">
+      <span class="ios-step-icon">1</span>
+      <span>Tocá el botón <strong>Compartir</strong> en la barra inferior (⎋).</span>
+    </div>
+    <div class="ios-step">
+      <span class="ios-step-icon">2</span>
+      <span>Seleccioná <strong>"Agregar a inicio"</strong> (➕).</span>
+    </div>
+  </div>
+</div>
+
+
   <script>
     /* ==========================================================================
        ESTADO GLOBAL Y VARIABLES
@@ -351,6 +371,31 @@
           .catch((err) => console.log('Error en Service Worker:', err));
       });
     }
+
+    // Detección de dispositivo iOS y estado de instalación
+function gestionarAvisoInstalacionIOS() {
+  const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const esModoApp = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const avisoDescartado = localStorage.getItem('suite_ios_banner_visto');
+
+  // Solo se muestra si está en un iPhone/iPad, usando el navegador web y no lo cerró antes
+  if (esIOS && !esModoApp && !avisoDescartado) {
+    const banner = document.getElementById('iosInstallBanner');
+    const btnCerrar = document.getElementById('btnCloseIosBanner');
+
+    if (banner) {
+      banner.style.display = 'flex';
+
+      btnCerrar.addEventListener('click', () => {
+        banner.style.display = 'none';
+        localStorage.setItem('suite_ios_banner_visto', 'true');
+      });
+    }
+  }
+}
+
+// Ejecutar la verificación al cargar
+window.addEventListener('load', gestionarAvisoInstalacionIOS);
 
     /* ==========================================================================
        ESCUDO DE PROTECCIÓN CONTRA INSPECCIÓN
