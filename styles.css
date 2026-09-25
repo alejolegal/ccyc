@@ -1337,3 +1337,94 @@ mark.hl-match {
   color: #6d28d9;
   border-color: rgba(139, 92, 246, 0.25);
 }
+
+/* Tarjeta instructiva para usuarios de iPhone/iPad */
+.ios-install-banner {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  animation: slideUp 0.3s ease;
+}
+
+[data-theme="dark"] .ios-install-banner {
+  background: rgba(30, 41, 59, 0.92);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.ios-banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ios-banner-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ios-banner-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0.2rem;
+}
+
+.ios-banner-body {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+[data-theme="dark"] .ios-banner-body {
+  color: #cbd5e1;
+}
+
+.ios-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.ios-step-icon {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .ios-step-icon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
