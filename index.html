@@ -1,500 +1,372 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legal Suite - Normativa Argentina</title>
+  <title>CÓDIGO CIVIL Y COMERCIAL - República Argentina</title>
 
-  <!-- PWA & Mobile Settings -->
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#f0f4f9">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <link rel="stylesheet" href="./styles.css">
 </head>
+
 <body data-theme="light">
-  <!-- Telón oscuro para cerrar el menú tocando afuera -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <div class="app-layout">
-    
-    <!-- Barra lateral / Navegación -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="brand-header">
-          <div class="brand-logo">⚖️</div>
-          <div class="brand-info">
-            <h2>Legal Suite</h2>
-            <span class="norma-tag" id="lblNormaActiva">CCyC Ley 26.994</span>
-          </div>
-        </div>
-        <!-- Botón para retroceder / cerrar menú en móviles -->
-        <button id="btnCloseSidebar" class="btn-close-sidebar" title="Cerrar índice">✕</button>
+  <div class="app-container">
+    <!-- Encabezado principal estilo cápsula -->
+    <div class="header-nav">
+      <button class="nav-tab" id="btnBiblioteca">📚 Biblioteca</button>
+      <button class="nav-tab active" id="btnBuscador">Buscador</button>
+      <button class="nav-tab" id="btnLector">Lector</button>
+      <button class="btn-icon-round" id="btnInstalar" title="Instalar sin conexión">📲</button>
+      <button class="btn-icon-round" id="btnThemeToggle" title="Cambiar tema">☀️</button>
+    </div>
+
+    <div class="header-nav">
+      <button class="nav-tab" id="btnBiblioteca">📚 Biblioteca</button>
+      <button class="nav-tab active" id="btnBuscador">Buscador</button>
+      <button class="nav-tab" id="btnLector">Lector</button>
+      <button class="btn-icon-round" id="btnInstalar" title="Instalar sin internet">📲</button>
+      <button class="btn-icon-round" id="btnThemeToggle" title="Cambiar tema">☀️</button>
+    </div>
+    </header>
+
+    <!-- Contador de normativa activa -->
+    <div class="counter-bar">
+      <span>Base normativa activa: <strong id="lblTotalArticulos">2579 artículos</strong></span>
+    </div>
+
+    <!-- Caja de Búsqueda Liquid Glass con accesos rápidos -->
+    <section class="search-panel">
+      <div class="search-panel-top">
+        <span>BUSCADOR DE ARTÍCULOS</span>
+        <span>Usa ⭐ para fijar tus artículos</span>
       </div>
 
-      <!-- Selector de norma -->
-      <div class="selector-box">
-        <label for="selectNorma">Normativa:</label>
-        <select id="selectNorma" class="custom-select">
-          <option value="ccyc">Código Civil y Comercial</option>
-          <option value="cn">Constitución Nacional</option>
-        </select>
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="inputBusqueda" placeholder="Escribí un número (ej: 750, 1187, 1708) o término..."
+          autocomplete="off">
+        <button id="btnClearSearch" class="btn-clear-input" style="display: none;">✕</button>
       </div>
 
-      <!-- Índice dinámico de libros -->
-      <nav class="nav-index" id="navIndex">
-        <!-- Generado dinámicamente -->
-      </nav>
-
-      <!-- Pie de barra lateral -->
-      <div class="sidebar-footer">
-        <a href="https://wa.me/5493786401010?text=Hola,%20tengo%20una%20consulta%20sobre%20Legal%20Suite" target="_blank" rel="noopener noreferrer" class="wa-btn" id="btnWhatsapp">
-          <span>💬</span>
-          <span>Soporte</span>
-        </a>
+      <div class="quick-access-section">
+        <div class="qa-header">
+          <span class="qa-title">MIS ACCESOS RÁPIDOS:</span>
+          <button class="btn-reset" id="btnResetPins">Restablecer</button>
+        </div>
+        <p class="qa-empty-text" id="qaEmptyText">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.
+        </p>
+        <div class="pinned-container" id="pinnedContainer" style="display: none;"></div>
       </div>
-    </aside>
+    </section>
 
-    <!-- Contenedor Principal -->
-    <main class="main-content">
-      
-      <!-- Barra superior / Header -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <button id="btnMobileIndex" class="btn-icon" title="Abrir índice">☰</button>
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="inputBusqueda" placeholder="Buscar por número o término..." autocomplete="off">
-            <button id="btnClearSearch" class="btn-clear" style="display: none;">✕</button>
-          </div>
-        </div>
-
-        <div class="topbar-right">
-          <!-- Botón directo a la guía de instalación -->
-          <button id="btnAbrirModalInstalar" class="btn-instalar" title="Cómo instalar">
-            📲 Instalar App
-          </button>
-
-          <!-- Conmutador de tema -->
-          <button id="btnThemeToggle" class="btn-theme" title="Cambiar tema">
-            🌓 Modo
-          </button>
-        </div>
-      </header>
-
-      <!-- Barra de accesos rápidos -->
-      <section class="quick-access-bar" id="quickAccessBar">
-        <!-- Renderizado dinámico -->
-      </section>
-
-      <!-- Contenedor de visualización de artículos -->
-      <section class="articles-container" id="articlesContainer">
-        <div class="loading-state" id="loadingState">
-          <p>Cargando cuerpo normativo...</p>
-        </div>
-      </section>
-
-      <button id="btnLoadMore" class="btn-load-more" style="display: none;">Cargar más artículos</button>
-
-      <!-- Pie de página -->
-      <footer class="app-footer">
-        <p>© 2026 Legal Suite • Todos los derechos reservados. Desarrollado para estudiantes y profesionales de Derecho.</p>
-      </footer>
+    <!-- Contenedor de Artículos -->
+    <main class="articles-list" id="articlesList">
+      <div class="loading-state" id="loadingState">
+        <p>Cargando artículos...</p>
+      </div>
     </main>
 
+    <div class="load-more-wrapper">
+      <button id="btnLoadMore" class="btn-load-more" style="display: none;">Cargar más artículos</button>
+    </div>
   </div>
 
-  <!-- MODAL DE INSTRUCCIONES DE DESCARGA / INSTALACIÓN -->
-  <div class="modal-overlay" id="modalInstalar">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>📲 Usar Legal Suite Offline</h3>
-        <button id="btnCloseModalInstalar" class="btn-close-modal">✕</button>
+  <!-- Modal Instrucciones de Descarga / Instalación -->
+  <div class="modal-backdrop" id="modalInstalar">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h3>📲 Usar Legal Suite sin Internet</h3>
+        <button class="modal-close" id="btnCloseModal">✕</button>
       </div>
+      <p class="modal-desc">Podés consultar todos los artículos sin conexión agregando la app a tu pantalla:</p>
 
-      <p style="font-size: 0.85rem; color: var(--text-muted);">
-        Podés usar Legal Suite como página web normal o instalarla en tu teléfono para abrirla a pantalla completa y consultar los artículos <strong>sin conexión a internet</strong>:
-      </p>
-
-      <!-- Sección iPhone -->
-      <div class="modal-section">
+      <div class="guide-box">
         <h4>🍏 En iPhone / iPad (Safari o Brave)</h4>
-        <div class="modal-step">
-          <span class="step-num">1</span>
-          <span>Abrí la página en tu navegador y tocá el botón de <strong>Compartir</strong> en la barra inferior (el cuadrado con la flecha hacia arriba <strong>⎋</strong>).</span>
+        <div class="guide-step">
+          <span class="num">1</span>
+          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el cuadro con la flecha hacia arriba
+            <strong>⎋</strong>).</span>
         </div>
-        <div class="modal-step">
-          <span class="step-num">2</span>
-          <span>Deslizá hacia abajo y seleccioná <strong>"Agregar a inicio"</strong> (<strong>➕</strong>).</span>
+        <div class="guide-step">
+          <span class="num">2</span>
+          <span>Elegí <strong>"Agregar a inicio"</strong> (<strong>➕</strong>).</span>
         </div>
-        <div class="modal-step">
-          <span class="step-num">3</span>
-          <span>Tocá <strong>"Agregar"</strong> arriba a la derecha. ¡Listo! Queda instalada como una app nativa.</span>
-        </div>
-      </div>
-
-      <!-- Sección Android -->
-      <div class="modal-section">
-        <h4>🤖 En Celulares Android (Chrome / Brave)</h4>
-        <div class="modal-step">
-          <span class="step-num">1</span>
-          <span>Tocá los <strong>tres puntos verticales (⋮)</strong> arriba a la derecha del navegador.</span>
-        </div>
-        <div class="modal-step">
-          <span class="step-num">2</span>
-          <span>Elegí la opción <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</span>
-        </div>
-        <div class="modal-step">
-          <span class="step-num">3</span>
-          <span>Aceptá y ya la tendrás en tu pantalla con acceso offline directo.</span>
+        <div class="guide-step">
+          <span class="num">3</span>
+          <span>Tocá <strong>"Agregar"</strong> arriba a la derecha.</span>
         </div>
       </div>
 
-      <!-- Botón de instalación nativa si el navegador lo soporta -->
-      <button id="btnInstalarNativoModal" class="btn-load-more" style="display: none; background: var(--accent); color: #fff;">
-        ⚡ Instalar ahora en este dispositivo
-      </button>
+      <div class="guide-box">
+        <h4>🤖 En Android (Chrome / Brave)</h4>
+        <div class="guide-step">
+          <span class="num">1</span>
+          <span>Tocá los <strong>tres puntos verticales (⋮)</strong> arriba a la derecha.</span>
+        </div>
+        <div class="guide-step">
+          <span class="num">2</span>
+          <span>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla
+              principal"</strong>.</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     /* ==========================================================================
-       ESTADO GLOBAL Y VARIABLES
+       DATOS Y ESTADO
        ========================================================================== */
-    let articulosCCyC = [];
-    let articulosCN = [];
-    let normaActual = 'ccyc';
-    let listaActualFiltrada = [];
-    let limitePaginado = 40; // Límite para rendimiento suave en celular
-    let eventoInstalacion = null;
+    let articulos = [];
+    let articulosFiltrados = [];
+    let limite = 25; // Límite fluido que evita que se cuelgue en móviles
+    let pinnedArticulos = JSON.parse(localStorage.getItem('ccyc_pinned') || '[]');
 
-    const articulosContainer = document.getElementById('articlesContainer');
+    const articlesList = document.getElementById('articlesList');
     const inputBusqueda = document.getElementById('inputBusqueda');
     const btnClearSearch = document.getElementById('btnClearSearch');
-    const selectNorma = document.getElementById('selectNorma');
-    const navIndex = document.getElementById('navIndex');
-    const quickAccessBar = document.getElementById('quickAccessBar');
-    const lblNormaActiva = document.getElementById('lblNormaActiva');
     const btnLoadMore = document.getElementById('btnLoadMore');
-    
-    // Menú móvil
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const btnMobileIndex = document.getElementById('btnMobileIndex');
-    const btnCloseSidebar = document.getElementById('btnCloseSidebar');
-
-    // Modal de instalación
-    const modalInstalar = document.getElementById('modalInstalar');
-    const btnAbrirModalInstalar = document.getElementById('btnAbrirModalInstalar');
-    const btnCloseModalInstalar = document.getElementById('btnCloseModalInstalar');
-    const btnInstalarNativoModal = document.getElementById('btnInstalarNativoModal');
+    const lblTotalArticulos = document.getElementById('lblTotalArticulos');
+    const pinnedContainer = document.getElementById('pinnedContainer');
+    const qaEmptyText = document.getElementById('qaEmptyText');
 
     /* ==========================================================================
-       CARGA DE BASES DE DATOS LOCALES
+       CARGA DE ARCHIVO
        ========================================================================== */
-    async function cargarBasesDeDatos() {
+    async function inicializar() {
       try {
-        const fetchCCyC = fetch('./articulos.json')
-          .then(r => r.ok ? r.json() : [])
-          .catch(() => []);
+        const res = await fetch('./articulos.json');
+        const data = await res.json();
+        articulos = Array.isArray(data) ? data : (data.articulos || []);
 
-        const fetchCN = fetch('./constitucion.json')
-          .then(r => r.ok ? r.json() : [])
-          .catch(() => []);
+        lblTotalArticulos.textContent = `${articulos.length} artículos`;
+        document.getElementById('loadingState').style.display = 'none';
 
-        const [resCCyC, resCN] = await Promise.all([fetchCCyC, fetchCN]);
-
-        articulosCCyC = Array.isArray(resCCyC) ? resCCyC : (resCCyC.articulos || []);
-        articulosCN = Array.isArray(resCN) ? resCN : (resCN.articulos || []);
-
-        const loading = document.getElementById('loadingState');
-        if (loading) loading.style.display = 'none';
-
-        seleccionarLibro(normaActual);
-      } catch (error) {
-        console.error('Error al cargar normativas:', error);
-        articulosContainer.innerHTML = '<p class="error-msg">Error al cargar la base de datos. Verifique los archivos JSON.</p>';
+        articulosFiltrados = articulos;
+        renderizarPins();
+        renderizarArticulos();
+      } catch (e) {
+        articlesList.innerHTML = '<p class="loading-state">Error al cargar la base normativa.</p>';
       }
     }
 
     /* ==========================================================================
-       GESTIÓN DE TEMAS
+       RENDERIZADO CON EFECTO DE DESVANECIDO
        ========================================================================== */
-    function aplicarTema(tema) {
-      document.body.setAttribute('data-theme', tema);
-      localStorage.setItem('suite_tema', tema);
-    }
-
-    function toggleTema() {
-      const actual = document.body.getAttribute('data-theme') || 'light';
-      let siguiente = 'dark';
-      if (actual === 'light') siguiente = 'dark';
-      else if (actual === 'dark') siguiente = 'sepia';
-      else siguiente = 'light';
-      aplicarTema(siguiente);
-    }
-
-    /* ==========================================================================
-       CONTROL DEL MENÚ MÓVIL (ABRIR, CERRAR, RETROCEDER)
-       ========================================================================== */
-    function abrirSidebar() {
-      sidebar.classList.add('open');
-      sidebarOverlay.classList.add('active');
-    }
-
-    function cerrarSidebar() {
-      sidebar.classList.remove('open');
-      sidebarOverlay.classList.remove('active');
-    }
-
-    /* ==========================================================================
-       SELECCIÓN DE NORMA Y RENDERIZADO OPTIMIZADO
-       ========================================================================== */
-    function seleccionarLibro(norma) {
-      normaActual = norma;
-      localStorage.setItem('suite_norma_activa', norma);
-      if (selectNorma) selectNorma.value = norma;
-      
-      if (norma === 'ccyc') {
-        lblNormaActiva.textContent = 'CCyC Ley 26.994';
-        renderizarIndiceCCyC();
-      } else {
-        lblNormaActiva.textContent = 'Constitución Nacional';
-        renderizarIndiceCN();
-      }
-      
-      inputBusqueda.value = '';
-      btnClearSearch.style.display = 'none';
-      listaActualFiltrada = obtenerArticulosActivos();
-      limitePaginado = 40;
-      renderizarVista();
-    }
-
-    function obtenerArticulosActivos() {
-      return normaActual === 'ccyc' ? articulosCCyC : articulosCN;
-    }
-
-    function renderizarIndiceCCyC() {
-      const libros = [
-        { id: 'TODOS', label: '📖 Todos los artículos' },
-        { id: 'TITULO PRELIMINAR', label: 'Título Preliminar' },
-        { id: 'LIBRO PRIMERO', label: 'Libro I - Parte General' },
-        { id: 'LIBRO SEGUNDO', label: 'Libro II - Familia' },
-        { id: 'LIBRO TERCERO', label: 'Libro III - Derechos Personales' },
-        { id: 'LIBRO CUARTO', label: 'Libro IV - Derechos Reales' },
-        { id: 'LIBRO QUINTO', label: 'Libro V - Sucesiones' },
-        { id: 'LIBRO SEXTO', label: 'Libro VI - Disp. Comunes' }
-      ];
-
-      navIndex.innerHTML = libros.map(l => `
-        <button class="index-item" onclick="filtrarPorEstructura('${l.id}')">${l.label}</button>
-      `).join('');
-
-      quickAccessBar.innerHTML = `
-        <span class="qa-tag" onclick="irArticulo('1')">Art. 1</span>
-        <span class="qa-tag" onclick="irArticulo('765')">Art. 765</span>
-        <span class="qa-tag" onclick="irArticulo('1092')">Art. 1092</span>
-        <span class="qa-tag" onclick="irArticulo('1708')">Art. 1708</span>
-      `;
-    }
-
-    function renderizarIndiceCN() {
-      const partes = [
-        { id: 'TODOS', label: '📖 Constitución Completa' },
-        { id: 'PREAMBULO', label: 'Preámbulo' },
-        { id: 'PRIMERA PARTE', label: 'Declaraciones, Derechos y Garantías' },
-        { id: 'SEGUNDA PARTE', label: 'Autoridades de la Nación' }
-      ];
-
-      navIndex.innerHTML = partes.map(p => `
-        <button class="index-item" onclick="filtrarPorEstructura('${p.id}')">${p.label}</button>
-      `).join('');
-
-      quickAccessBar.innerHTML = `
-        <span class="qa-tag" onclick="irArticulo('Preámbulo')">Preámbulo</span>
-        <span class="qa-tag" onclick="irArticulo('14')">Art. 14</span>
-        <span class="qa-tag" onclick="irArticulo('14 bis')">Art. 14 bis</span>
-        <span class="qa-tag" onclick="irArticulo('19')">Art. 19</span>
-        <span class="qa-tag" onclick="irArticulo('75')">Art. 75 inc. 22</span>
-      `;
-    }
-
-    // Renderizado eficiente: solo pinta en pantalla un lote a la vez para no congelar el celular
-    function renderizarVista() {
-      if (!listaActualFiltrada || listaActualFiltrada.length === 0) {
-        articulosContainer.innerHTML = '<p class="empty-msg">No se encontraron artículos.</p>';
+    function renderizarArticulos() {
+      if (articulosFiltrados.length === 0) {
+        articlesList.innerHTML = '<p class="loading-state">No se encontraron artículos.</p>';
         btnLoadMore.style.display = 'none';
         return;
       }
 
-      const itemsVisibles = listaActualFiltrada.slice(0, limitePaginado);
+      const lista = articulosFiltrados.slice(0, limite);
 
-      articulosContainer.innerHTML = itemsVisibles.map(art => `
-        <article class="article-card" id="art-${art.numero}">
-          <div class="article-header">
-            <span class="art-badge">Artículo ${art.numero}</span>
-            <span class="art-title">${art.titulo || ''}</span>
-          </div>
-          <div class="article-body">
-            <p>${art.texto || art.contenido || ''}</p>
-          </div>
-        </article>
-      `).join('');
+      articlesList.innerHTML = lista.map(art => {
+        const esFijado = pinnedArticulos.includes(String(art.numero));
+        const texto = art.texto || art.contenido || '';
+        const esLargo = texto.length > 280;
 
-      // Si hay más artículos en la lista, muestra el botón para seguir cargando
-      if (listaActualFiltrada.length > limitePaginado) {
-        btnLoadMore.style.display = 'block';
-      } else {
-        btnLoadMore.style.display = 'none';
-      }
+        return `
+          <article class="art-card" id="card-${art.numero}">
+            <div class="art-card-header">
+              <div>
+                <span class="art-badge-tag">${(art.libro || 'TÍTULO PRELIMINAR').toUpperCase()}</span>
+                <h2 class="art-card-title">ARTÍCULO ${art.numero}° - ${art.titulo || ''}</h2>
+                <span class="art-card-sub">Código Civil y Comercial de la Nación</span>
+              </div>
+              <div class="art-actions">
+                <button class="btn-action ${esFijado ? 'active' : ''}" onclick="togglePin('${art.numero}')">
+                  ${esFijado ? '★ Pinned' : '☆ Pin'}
+                </button>
+                <button class="btn-action" onclick="copiarArticulo('${art.numero}')">Copiar</button>
+                <button class="btn-action btn-wa" onclick="compartirWhatsapp('${art.numero}')">
+                  <span>📲</span> WhatsApp
+                </button>
+              </div>
+            </div>
+
+            <div class="art-card-body-wrapper ${esLargo ? 'truncated' : ''}" id="wrap-${art.numero}">
+              <p class="art-card-body">${texto}</p>
+            </div>
+
+            ${esLargo ? `
+              <button class="btn-expand" id="btn-exp-${art.numero}" onclick="expandirTexto('${art.numero}')">
+                ▼ Leer artículo completo
+              </button>
+            ` : ''}
+          </article>
+        `;
+      }).join('');
+
+      btnLoadMore.style.display = articulosFiltrados.length > limite ? 'inline-block' : 'none';
+    }
+
+    function expandirTexto(num) {
+      const wrap = document.getElementById(`wrap-${num}`);
+      const btn = document.getElementById(`btn-exp-${num}`);
+      if (wrap) wrap.classList.remove('truncated');
+      if (btn) btn.style.display = 'none';
     }
 
     if (btnLoadMore) {
       btnLoadMore.addEventListener('click', () => {
-        limitePaginado += 40;
-        renderizarVista();
+        limite += 25;
+        renderizarArticulos();
       });
     }
 
     /* ==========================================================================
-       FILTRADO, BÚSQUEDA Y ACCIONES
+       BÚSQUEDA FLUIDA
        ========================================================================== */
-    function irArticulo(num) {
-      inputBusqueda.value = num;
-      ejecutarBusqueda();
-    }
-
-    function filtrarPorEstructura(filtro) {
-      const lista = obtenerArticulosActivos();
-      if (filtro === 'TODOS') {
-        listaActualFiltrada = lista;
+    inputBusqueda.addEventListener('input', () => {
+      const val = inputBusqueda.value.trim().toLowerCase();
+      if (!val) {
+        btnClearSearch.style.display = 'none';
+        articulosFiltrados = articulos;
       } else {
-        listaActualFiltrada = lista.filter(a => {
-          return (a.libro && a.libro.toUpperCase().includes(filtro)) ||
-                 (a.parte && a.parte.toUpperCase().includes(filtro));
+        btnClearSearch.style.display = 'block';
+        articulosFiltrados = articulos.filter(a => {
+          const num = String(a.numero).toLowerCase();
+          const matchNum = num === val || num.startsWith(val);
+          const matchTitulo = a.titulo && a.titulo.toLowerCase().includes(val);
+          const matchTexto = (a.texto || a.contenido || '').toLowerCase().includes(val);
+          return matchNum || matchTitulo || matchTexto;
         });
       }
-      limitePaginado = 40;
-      renderizarVista();
-      cerrarSidebar(); // En móvil cierra el menú al elegir
+      limite = 25;
+      renderizarArticulos();
+    });
+
+    btnClearSearch.addEventListener('click', () => {
+      inputBusqueda.value = '';
+      btnClearSearch.style.display = 'none';
+      articulosFiltrados = articulos;
+      limite = 25;
+      renderizarArticulos();
+    });
+
+    /* ==========================================================================
+       PINS / ACCESOS RÁPIDOS
+       ========================================================================== */
+    function togglePin(num) {
+      const str = String(num);
+      if (pinnedArticulos.includes(str)) {
+        pinnedArticulos = pinnedArticulos.filter(n => n !== str);
+      } else {
+        pinnedArticulos.push(str);
+      }
+      localStorage.setItem('ccyc_pinned', JSON.stringify(pinnedArticulos));
+      renderizarPins();
+      renderizarArticulos();
     }
 
-    function ejecutarBusqueda() {
-      const query = inputBusqueda.value.trim().toLowerCase();
-      const lista = obtenerArticulosActivos();
-
-      if (!query) {
-        btnClearSearch.style.display = 'none';
-        listaActualFiltrada = lista;
-        limitePaginado = 40;
-        renderizarVista();
+    function renderizarPins() {
+      if (pinnedArticulos.length === 0) {
+        qaEmptyText.style.display = 'block';
+        pinnedContainer.style.display = 'none';
+        pinnedContainer.innerHTML = '';
         return;
       }
 
-      btnClearSearch.style.display = 'inline-flex';
-
-      listaActualFiltrada = lista.filter(a => {
-        const numStr = String(a.numero).toLowerCase();
-        const matchNum = numStr === query || numStr.startsWith(query);
-        const matchTitulo = a.titulo ? a.titulo.toLowerCase().includes(query) : false;
-        const matchTexto = (a.texto || a.contenido) ? (a.texto || a.contenido).toLowerCase().includes(query) : false;
-        return matchNum || matchTitulo || matchTexto;
-      });
-
-      limitePaginado = 40;
-      renderizarVista();
+      qaEmptyText.style.display = 'none';
+      pinnedContainer.style.display = 'flex';
+      pinnedContainer.innerHTML = pinnedArticulos.map(num => `
+        <span class="qa-badge" onclick="irArticulo('${num}')">Art. ${num}</span>
+      `).join('');
     }
+
+    document.getElementById('btnResetPins').addEventListener('click', () => {
+      pinnedArticulos = [];
+      localStorage.removeItem('ccyc_pinned');
+      renderizarPins();
+      renderizarArticulos();
+    });
+
+    function irArticulo(num) {
+      inputBusqueda.value = num;
+      inputBusqueda.dispatchEvent(new Event('input'));
+    }
+
+    /* ==========================================================================
+       ACCIONES (COPIAR & WHATSAPP)
+       ========================================================================== */
+    function copiarArticulo(num) {
+      const art = articulos.find(a => String(a.numero) === String(num));
+      if (!art) return;
+      const texto = `ARTÍCULO ${art.numero}° - ${art.titulo || ''}\n\n${art.texto || art.contenido}\n(Código Civil y Comercial de la Nación)`;
+      navigator.clipboard.writeText(texto);
+      alert(`Artículo ${num} copiado al portapapeles.`);
+    }
+
+    function compartirWhatsapp(num) {
+      const art = articulos.find(a => String(a.numero) === String(num));
+      if (!art) return;
+      const texto = `*ARTÍCULO ${art.numero}° - ${art.titulo || ''}*\n\n${art.texto || art.contenido}\n\n_(CCyC de la Nación)_`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    /* ==========================================================================
+       TEMAS (LUZ / OSCURO)
+       ========================================================================== */
+    const btnTheme = document.getElementById('btnThemeToggle');
+    const temaGuardado = localStorage.getItem('ccyc_theme') || 'light';
+    document.body.setAttribute('data-theme', temaGuardado);
+    btnTheme.textContent = temaGuardado === 'dark' ? '🌙' : '☀️';
+
+    btnTheme.addEventListener('click', () => {
+      const actual = document.body.getAttribute('data-theme');
+      const siguiente = actual === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', siguiente);
+      localStorage.setItem('ccyc_theme', siguiente);
+      btnTheme.textContent = siguiente === 'dark' ? '🌙' : '☀️';
+    });
 
     /* ==========================================================================
        MODAL DE INSTALACIÓN
        ========================================================================== */
-    if (btnAbrirModalInstalar) {
-      btnAbrirModalInstalar.addEventListener('click', () => {
-        modalInstalar.classList.add('active');
-      });
-    }
-
-    if (btnCloseModalInstalar) {
-      btnCloseModalInstalar.addEventListener('click', () => {
-        modalInstalar.classList.remove('active');
-      });
-    }
-
+    const modalInstalar = document.getElementById('modalInstalar');
+    document.getElementById('btnInstalar').addEventListener('click', () => {
+      modalInstalar.classList.add('active');
+    });
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      modalInstalar.classList.remove('active');
+    });
     modalInstalar.addEventListener('click', (e) => {
       if (e.target === modalInstalar) modalInstalar.classList.remove('active');
     });
 
-    // Soporte PWA directo si el navegador lo permite
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      eventoInstalacion = e;
-      if (btnInstalarNativoModal) {
-        btnInstalarNativoModal.style.display = 'block';
-      }
-    });
-
-    if (btnInstalarNativoModal) {
-      btnInstalarNativoModal.addEventListener('click', async () => {
-        if (!eventoInstalacion) return;
-        eventoInstalacion.prompt();
-        const { outcome } = await eventoInstalacion.userChoice;
-        if (outcome === 'accepted') {
-          modalInstalar.classList.remove('active');
-        }
-        eventoInstalacion = null;
-      });
-    }
-
     /* ==========================================================================
-       INICIALIZACIÓN
-       ========================================================================== */
-    window.addEventListener('DOMContentLoaded', () => {
-      aplicarTema(localStorage.getItem('suite_tema') || 'light');
-      
-      const btnTema = document.getElementById('btnThemeToggle');
-      if (btnTema) btnTema.addEventListener('click', toggleTema);
-
-      if (btnMobileIndex) btnMobileIndex.addEventListener('click', abrirSidebar);
-      if (btnCloseSidebar) btnCloseSidebar.addEventListener('click', cerrarSidebar);
-      if (sidebarOverlay) sidebarOverlay.addEventListener('click', cerrarSidebar);
-
-      if (selectNorma) {
-        selectNorma.addEventListener('change', (e) => seleccionarLibro(e.target.value));
-      }
-
-      if (inputBusqueda) {
-        inputBusqueda.addEventListener('input', ejecutarBusqueda);
-      }
-
-      if (btnClearSearch) {
-        btnClearSearch.addEventListener('click', () => {
-          inputBusqueda.value = '';
-          btnClearSearch.style.display = 'none';
-          listaActualFiltrada = obtenerArticulosActivos();
-          limitePaginado = 40;
-          renderizarVista();
-        });
-      }
-
-      cargarBasesDeDatos();
-    });
-
-    /* ==========================================================================
-       SERVICE WORKER Y PROTECCIÓN
+       SERVICE WORKER (OFFLINE)
        ========================================================================== */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js').catch(() => { });
       });
     }
 
+    /* ==========================================================================
+       ESCUDO DE PROTECCIÓN CONTRA INSPECCIÓN
+       ========================================================================== */
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
-      if (e.keyCode === 123 || (e.ctrlKey && (e.key === 'u' || e.key === 's')) || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+      if (
+        e.keyCode === 123 ||
+        (e.ctrlKey && (e.key === 'u' || e.key === 's')) ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))
+      ) {
         e.preventDefault();
+        return false;
       }
     });
+
+    window.addEventListener('DOMContentLoaded', inicializar);
   </script>
 </body>
+
 </html>
