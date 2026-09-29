@@ -1,25 +1,46 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="burgundy" data-font="sans" data-size="medium">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>LEGAL SUITE - República Argentina</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>LEGAL SUITE · Argentina</title>
 
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#f0f4f9">
+  <meta name="theme-color" id="metaThemeColor" content="#5B0F18">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <!-- Versionado 5.1.0 para forzar actualización de caché -->
-  <link rel="stylesheet" href="./styles.css?v=5.1.0">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon.svg">
+
+  <!-- Fuentes: Moderna (Inter), Clásica (Cinzel) y Editorial (Playfair Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles.css?v=15.0.0">
 </head>
-<body data-theme="light">
+
+<body data-theme="burgundy" data-font="sans" data-size="medium">
 
   <div class="app-container">
-    <!-- Encabezado principal -->
     <header class="main-header">
       <div class="header-brand">
-        <div class="logo-box">⚖️</div>
+        <div class="logo-box">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+            <path d="M4 7l8-4 8 4"></path>
+            <path d="M6 7l-3 7h6l-3-7"></path>
+            <path d="M18 7l-3 7h6l-3-7"></path>
+            <path d="M6 14a3 3 0 0 0 6 0"></path>
+            <path d="M18 14a3 3 0 0 0 6 0"></path>
+            <line x1="4" y1="21" x2="20" y2="21"></line>
+          </svg>
+        </div>
         <div class="header-text">
           <h1 class="main-title" id="tituloEncabezado">CÓDIGO CIVIL Y COMERCIAL</h1>
           <p class="subtitle" id="subtituloEncabezado">República Argentina · Ley 26.994</p>
@@ -27,49 +48,50 @@
       </div>
 
       <nav class="header-nav">
-        <button class="nav-tab" id="btnAbrirBiblioteca">
-          <span>📚 Biblioteca</span>
-        </button>
+        <button class="nav-tab" id="btnAbrirBiblioteca">Biblioteca</button>
         <button class="nav-tab active" id="btnBuscador">Buscador</button>
         <button class="nav-tab" id="btnLector">Lector</button>
-        <button class="btn-icon-round btn-only-mobile" id="btnInstalar" title="Instalar sin conexión">📲</button>
-        <button class="btn-icon-round" id="btnThemeToggle" title="Cambiar tema">☀️</button>
       </nav>
     </header>
 
-    <!-- Barra de estado -->
     <div class="counter-bar">
-      <span>Base normativa activa: <strong id="lblTotalArticulos">Cargando...</strong></span>
+      <span>Artículos disponibles: <strong id="lblTotalArticulos">Cargando...</strong></span>
       <span id="lblFiltroActivo" class="filter-indicator"></span>
     </div>
 
-    <!-- Caja de Búsqueda -->
     <section class="search-panel" id="panelBuscador">
       <div class="search-panel-top">
-        <span>BUSCADOR DE ARTÍCULOS</span>
-        <span>Usa ⭐ para fijar tus artículos</span>
+        <span>BUSCADOR RÁPIDO</span>
+        <span>Guardá con «Fijar»</span>
       </div>
 
       <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="inputBusqueda" placeholder="Escribí un número o término..." autocomplete="off">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" id="inputBusqueda" placeholder="Escribí un número de artículo o palabra clave..."
+          autocomplete="off">
         <button id="btnClearSearch" class="btn-clear-input" style="display: none;">✕</button>
       </div>
 
       <div class="quick-access-section">
         <div class="qa-header">
-          <span class="qa-title">MIS ACCESOS RÁPIDOS:</span>
-          <button class="btn-reset" id="btnResetPins">Restablecer</button>
+          <span class="qa-title">ARTÍCULOS FIJADOS</span>
+          <button class="btn-clean-pill" id="btnResetPins">Limpiar</button>
         </div>
-        <p class="qa-empty-text" id="qaEmptyText">No tenés accesos fijados. Hacé clic en ⭐ Pin en cualquier artículo.</p>
+        <p class="qa-empty-text" id="qaEmptyText">No tenés artículos fijados todavía. Tocá «Fijar» en cualquier artículo
+          para tenerlo a mano.</p>
         <div class="pinned-container" id="pinnedContainer" style="display: none;"></div>
       </div>
     </section>
 
-    <!-- Contenedor principal de Artículos -->
     <main class="articles-list" id="articlesList">
       <div class="loading-state" id="loadingState">
-        <p>Cargando cuerpo normativo...</p>
+        <p>Cargando artículos...</p>
       </div>
     </main>
 
@@ -78,128 +100,345 @@
     </div>
   </div>
 
-  <!-- BOTÓN FLOTANTE INFERIOR DEL MODO LECTOR -->
   <div class="floating-reader-bar" id="floatingReaderBar" style="display: none;">
     <button class="btn-floating-index" id="btnAbrirIndice">
-      <span>📑 Índice de Capítulos</span>
+      <span>Índice de Capítulos</span>
       <span class="badge-index" id="lblIndiceActual">Libro I</span>
     </button>
   </div>
 
-  <!-- MODAL BIBLIOTECA -->
+  <div class="floating-action-trigger-wrapper" id="actionTriggerWrapper">
+    <button class="btn-action-trigger" id="btnActionTrigger" title="Menú de Opciones">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+        </path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="action-sheet-backdrop" id="actionSheetBackdrop">
+    <div class="action-sheet-panel" id="actionSheetPanel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h4>Herramientas</h4>
+        <button class="sheet-close" id="btnCloseActionSheet">✕</button>
+      </div>
+      <div class="sheet-options-list">
+        <button class="sheet-option-item" id="btnOptCasos">
+          <div class="opt-badge-icon">§</div>
+          <div class="opt-info">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <strong>Casos Prácticos</strong>
+              <span class="badge-demo">DEMO</span>
+            </div>
+            <p>Casos guía para parciales y qué artículos aplicar.</p>
+          </div>
+          <span class="opt-arrow">›</span>
+        </button>
+
+        <button class="sheet-option-item" id="btnOptPerfil">
+          <div class="opt-badge-icon">ID</div>
+          <div class="opt-info">
+            <strong>Acerca del Proyecto</strong>
+            <p>Desarrollo, contacto y sugerencias de mejora.</p>
+          </div>
+          <span class="opt-arrow">›</span>
+        </button>
+
+        <button class="sheet-option-item" id="btnOptConfig">
+          <div class="opt-badge-icon">⚙</div>
+          <div class="opt-info">
+            <strong>Configuración & Estilo</strong>
+            <p>Colores, tamaño de letra y tipo de tipografía.</p>
+          </div>
+          <span class="opt-arrow">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalCasos">
+    <div class="modal-box modal-box-large">
+      <div class="modal-top">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <h3 style="margin: 0;">Casos Prácticos</h3>
+            <span class="badge-demo">VERSIÓN DE PRUEBA</span>
+          </div>
+          <p class="modal-desc" style="margin-bottom: 0;">Elegí un caso para ver cómo encuadrarlo y qué artículos
+            consultar:</p>
+        </div>
+        <button class="modal-close" id="btnCloseCasos">✕</button>
+      </div>
+
+      <div class="modal-scroll-area">
+        <div class="cases-selector-list" id="casesSelectorList"></div>
+
+        <div class="case-detail-card" id="caseDetailCard" style="display: none;">
+          <button class="btn-back-cases" id="btnBackCases">‹ Volver a la lista de casos</button>
+          <div class="case-detail-header">
+            <span class="case-tag" id="detailCaseRama">CIVIL Y COMERCIAL</span>
+            <h4 id="detailCaseTitulo">Título del Caso</h4>
+          </div>
+          <div class="case-section-box">
+            <strong>Situación del Caso:</strong>
+            <p id="detailCaseHecho"></p>
+          </div>
+          <div class="case-section-box">
+            <strong>Cómo lo resuelve la Ley:</strong>
+            <p id="detailCaseEncuadre"></p>
+          </div>
+          <div class="case-section-box">
+            <strong>Artículos sugeridos:</strong>
+            <div class="case-articles-chips" id="detailCaseChips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalPerfil">
+    <div class="modal-box profile-modal-box">
+      <button class="modal-close profile-close-btn" id="btnClosePerfil">✕</button>
+      <div class="profile-banner"></div>
+      <div class="profile-avatar-container">
+        <div class="profile-avatar-ring">
+          <span class="profile-avatar-text">LS</span>
+        </div>
+      </div>
+      <div class="profile-body">
+        <h3 class="profile-name">Legal Suite</h3>
+        <span class="profile-badge">Herramienta para Estudiantes de Derecho</span>
+        <p class="profile-bio">
+          Creada para que puedas consultar las leyes rápido, sin depender de internet y con una lectura cómoda en la
+          facultad o en tu casa.
+        </p>
+        <div class="profile-links-group">
+          <a href="https://www.instagram.com/alejo.legal/reels/" target="_blank" rel="noopener noreferrer"
+            class="profile-link-btn" style="text-decoration: none;">
+            Consultas & Sugerencias en Instagram
+          </a>
+          <button class="profile-link-btn"
+            onclick="navigator.clipboard.writeText(window.location.href); alert('Enlace copiado al portapapeles.');">
+            Copiar enlace para compartir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalConfig">
+    <div class="modal-box">
+      <div class="modal-top">
+        <div>
+          <h3>Configuración</h3>
+          <p class="modal-desc" style="margin-bottom: 0;">Personalizá tu experiencia de lectura:</p>
+        </div>
+        <button class="modal-close" id="btnCloseConfig">✕</button>
+      </div>
+
+      <div class="config-options-wrapper">
+        <div class="config-row">
+          <label>Tema de color:</label>
+          <div class="theme-palette-grid">
+            <button class="palette-card" id="btnThemeCream" onclick="setPalette('soft-cream')">
+              <span class="swatch swatch-cream"></span>
+              <div class="palette-meta">
+                <strong>Soft Cream</strong>
+                <span>Lectura clara · Papel</span>
+              </div>
+            </button>
+            <button class="palette-card active" id="btnThemeBurgundy" onclick="setPalette('burgundy')">
+              <span class="swatch swatch-burgundy"></span>
+              <div class="palette-meta">
+                <strong>Burgundy Wine</strong>
+                <span>Bordó profundo · Tribunal</span>
+              </div>
+            </button>
+            <button class="palette-card" id="btnThemeTiber" onclick="setPalette('tiber')">
+              <span class="swatch swatch-tiber"></span>
+              <div class="palette-meta">
+                <strong>Tiber Green</strong>
+                <span>Verde oscuro · Biblioteca</span>
+              </div>
+            </button>
+            <button class="palette-card" id="btnThemeNavy" onclick="setPalette('navy')">
+              <span class="swatch swatch-navy"></span>
+              <div class="palette-meta">
+                <strong>Midnight Navy</strong>
+                <span>Azul noche · Institucional</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <label>Tipografía de la app:</label>
+          <div class="btn-group-toggle font-toggle-grid">
+            <button class="cfg-btn active" id="btnFontSans">Moderna</button>
+            <button class="cfg-btn" id="btnFontClasica">Clásica</button>
+            <button class="cfg-btn" id="btnFontEditorial">Editorial</button>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <label>Tamaño de texto en artículos:</label>
+          <div class="btn-group-toggle">
+            <button class="cfg-btn" id="btnFontSmall">Pequeña</button>
+            <button class="cfg-btn active" id="btnFontMed">Mediana</button>
+            <button class="cfg-btn" id="btnFontLarge">Grande</button>
+          </div>
+        </div>
+
+        <div class="config-row config-divider">
+          <label>Opciones adicionales:</label>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button class="btn-secondary-action" id="btnAbrirGuiaInstalacion">
+              Instalar en el celular (Uso sin internet)
+            </button>
+            <button class="btn-danger-outline" id="btnClearStorage">
+              Restablecer artículos fijados y configuración
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="modalBiblioteca">
     <div class="modal-box">
       <div class="modal-top">
-        <div class="modal-header-icon-title">
-          <span class="modal-icon">📚</span>
-          <div>
-            <h3>Biblioteca Jurídica</h3>
-            <p class="modal-desc" style="margin-bottom: 0;">Seleccioná la ley a consultar:</p>
-          </div>
+        <div>
+          <h3>Biblioteca</h3>
+          <p class="modal-desc" style="margin-bottom: 0;">Elegí qué ley querés consultar:</p>
         </div>
         <button class="modal-close" id="btnCloseBiblioteca">✕</button>
       </div>
 
       <div class="library-choices">
-        <!-- 1. Código Civil y Comercial -->
         <div class="library-choice-card active" id="cardChoiceCCYC" onclick="cambiarNorma('ccyc')">
-          <div class="choice-icon">⚖️</div>
+          <div class="choice-monogram">CCyC</div>
           <div class="choice-content">
             <span class="choice-tag">LEY 26.994</span>
             <h4>Código Civil y Comercial</h4>
-            <p>2579 artículos · Título Preliminar y 6 Libros.</p>
+            <p>2.579 artículos · Título Preliminar y 6 Libros.</p>
           </div>
         </div>
-
-        <!-- 2. Constitución Nacional -->
         <div class="library-choice-card" id="cardChoiceCN" onclick="cambiarNorma('cn')">
-          <div class="choice-icon">📜</div>
+          <div class="choice-monogram">CN</div>
           <div class="choice-content">
-            <span class="choice-tag">TEXTO 1994</span>
+            <span class="choice-tag">TEXTO CONSTITUCIONAL</span>
             <h4>Constitución Nacional</h4>
-            <p>Preámbulo, 129 artículos y disposiciones transitorias.</p>
+            <p>Preámbulo, 129 artículos y reformas de 1994.</p>
           </div>
         </div>
-
-        <!-- 3. Próximo Libro en Desarrollo -->
         <div class="library-choice-card card-upcoming">
-          <div class="choice-icon">🔒</div>
+          <div class="choice-monogram">CP</div>
           <div class="choice-content">
-            <span class="choice-tag tag-upcoming">EN DESARROLLO</span>
-            <h4>Código Penal de la Nación</h4>
-            <p>Ley 11.179 · Próximamente disponible en Legal Suite.</p>
+            <span class="choice-tag tag-upcoming">PRÓXIMAMENTE</span>
+            <h4>Código Penal</h4>
+            <p>Ley 11.179 · Próxima actualización.</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL ÍNDICE (MODO LECTOR) -->
   <div class="modal-backdrop" id="modalIndice">
     <div class="modal-box modal-box-large">
       <div class="modal-top">
-        <div class="modal-header-icon-title">
-          <span class="modal-icon">📑</span>
-          <div>
-            <h3 id="tituloModalIndice">Índice Temático</h3>
-            <p class="modal-desc" style="margin-bottom: 0;">Saltá directo a un libro, título o capítulo:</p>
-          </div>
+        <div>
+          <h3 id="tituloModalIndice">Índice de Capítulos</h3>
+          <p class="modal-desc" style="margin-bottom: 0;">Seleccioná una parte para ir directo a sus artículos:</p>
         </div>
         <button class="modal-close" id="btnCloseIndice">✕</button>
       </div>
-
       <div class="modal-scroll-area" id="indiceContainer"></div>
     </div>
   </div>
 
-  <!-- MODAL INSTALACIÓN OFFLINE -->
   <div class="modal-backdrop" id="modalInstalar">
     <div class="modal-box">
       <div class="modal-top">
-        <div class="modal-header-icon-title">
-          <span class="modal-icon">📲</span>
-          <div>
-            <h3>Instalar Legal Suite</h3>
-            <p class="modal-desc" style="margin-bottom: 0;">Para usar sin internet en cualquier momento:</p>
-          </div>
+        <div>
+          <h3>Instalar en el Celular</h3>
+          <p class="modal-desc" style="margin-bottom: 0;">Para entrar directo sin gastar datos ni depender de internet:
+          </p>
         </div>
         <button class="modal-close" id="btnCloseModal">✕</button>
       </div>
-
       <div class="guide-box">
-        <h4>🍏 En iPhone / iPad (Safari o Brave)</h4>
+        <h4>En iPhone / iPad (Safari)</h4>
         <div class="guide-step">
-          <span class="num">1</span>
-          <span>Tocá el botón <strong>Compartir</strong> abajo en la barra (el icono <strong>⎋</strong> con la flecha hacia arriba).</span>
+          <span class="num">1.</span>
+          <span>Tocá el botón <strong>Compartir</strong> (el cuadrado con la flecha arriba).</span>
         </div>
         <div class="guide-step">
-          <span class="num">2</span>
-          <span>Elegí <strong>"Agregar a inicio"</strong> (<strong>➕</strong>).</span>
+          <span class="num">2.</span>
+          <span>Buscá y tocá <strong>«Agregar a inicio»</strong>.</span>
         </div>
         <div class="guide-step">
-          <span class="num">3</span>
-          <span>Tocá <strong>"Agregar"</strong> arriba a la derecha.</span>
+          <span class="num">3.</span>
+          <span>Tocá <strong>«Agregar»</strong> arriba a la derecha.</span>
         </div>
       </div>
-
       <div class="guide-box">
-        <h4>🤖 En Android (Chrome / Brave)</h4>
+        <h4>En Android (Chrome / Brave)</h4>
         <div class="guide-step">
-          <span class="num">1</span>
-          <span>Tocá los <strong>tres puntos (⋮)</strong> arriba a la derecha.</span>
+          <span class="num">1.</span>
+          <span>Tocá los tres puntos (⋮) arriba a la derecha.</span>
         </div>
         <div class="guide-step">
-          <span class="num">2</span>
-          <span>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</span>
+          <span class="num">2.</span>
+          <span>Elegí <strong>«Instalar aplicación»</strong> o «Agregar a pantalla principal».</span>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    /* ==========================================================================
-       ESTADO GLOBAL
-       ========================================================================== */
+    const CASOS_PRACTICOS = [
+      {
+        id: 1,
+        rama: "DAÑOS Y PERJUICIOS",
+        titulo: "Accidente de Tránsito: Peatón embestido en la calle",
+        hecho: "Un peatón cruzaba por la esquina y fue embestido por un auto que iba a velocidad reglamentaria. El conductor dice que no tuvo intención de lastimarlo.",
+        encuadre: "Hay responsabilidad objetiva por el riesgo del vehículo. El dueño o conductor responde siempre, salvo que demuestre que la culpa fue exclusivamente de la víctima o de un tercero.",
+        normaAsociada: "ccyc",
+        articulos: ["1716", "1757", "1758", "1769"]
+      },
+      {
+        id: 2,
+        rama: "CONTRATOS",
+        titulo: "Compra de Departamento con Humedad y Caños Rotos",
+        hecho: "El comprador recibe las llaves del departamento y al mes descubre caños rotos y rajaduras que habían sido tapadas con pintura fresca antes de la venta.",
+        encuadre: "Son vicios ocultos (redhibitorios). Quien vende algo cobrando un precio debe garantizar que no tenga defectos ocultos graves que impidan usar la propiedad normalmente.",
+        normaAsociada: "ccyc",
+        articulos: ["1051", "1052", "1054", "1055"]
+      },
+      {
+        id: 3,
+        rama: "DERECHO CONSTITUCIONAL",
+        titulo: "Amparo por Negativa de Medicamento Urgente",
+        hecho: "Una obra social o prepaga rechaza entregar un medicamento oncológico urgente recetado por el médico, diciendo que no entra en el plan básico.",
+        encuadre: "Corresponde iniciar una acción de amparo individual urgente para frenar la lesión al derecho fundamental a la vida y a la salud integral reconocidos por la Constitución y Tratados.",
+        normaAsociada: "cn",
+        articulos: ["43", "75"]
+      },
+      {
+        id: 4,
+        rama: "FAMILIA",
+        titulo: "Separación de Pareja Conviviente y Compensación Económica",
+        hecho: "Después de convivir 7 años, la pareja se separa. Uno de ellos dejó su carrera profesional para cuidar a los hijos y la casa, y ahora queda sin ingresos.",
+        encuadre: "Corresponde compensación económica por el desequilibrio patrimonial causado por la ruptura. Hay un plazo de 6 meses desde el cese para reclamarla.",
+        normaAsociada: "ccyc",
+        articulos: ["524", "525"]
+      }
+    ];
+
     let articulosCCyC = [];
     let articulosCN = [];
     let normaActiva = localStorage.getItem('suite_norma_activa') || 'ccyc';
@@ -226,6 +465,7 @@
     const floatingReaderBar = document.getElementById('floatingReaderBar');
     const btnAbrirIndice = document.getElementById('btnAbrirIndice');
     const lblIndiceActual = document.getElementById('lblIndiceActual');
+    const actionTriggerWrapper = document.getElementById('actionTriggerWrapper');
 
     const modalBiblioteca = document.getElementById('modalBiblioteca');
     const btnAbrirBiblioteca = document.getElementById('btnAbrirBiblioteca');
@@ -237,13 +477,30 @@
     const tituloModalIndice = document.getElementById('tituloModalIndice');
 
     const modalInstalar = document.getElementById('modalInstalar');
-    const btnInstalar = document.getElementById('btnInstalar');
     const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnAbrirGuiaInstalacion = document.getElementById('btnAbrirGuiaInstalacion');
 
-    /* ==========================================================================
-       LIMPIEZA DE CONSTITUCIÓN NACIONAL (CORRECCIÓN ARTÍCULO 14 BIS)
-       ========================================================================== */
+    const btnActionTrigger = document.getElementById('btnActionTrigger');
+    const actionSheetBackdrop = document.getElementById('actionSheetBackdrop');
+    const btnCloseActionSheet = document.getElementById('btnCloseActionSheet');
+
+    const modalCasos = document.getElementById('modalCasos');
+    const btnOptCasos = document.getElementById('btnOptCasos');
+    const btnCloseCasos = document.getElementById('btnCloseCasos');
+    const casesSelectorList = document.getElementById('casesSelectorList');
+    const caseDetailCard = document.getElementById('caseDetailCard');
+    const btnBackCases = document.getElementById('btnBackCases');
+
+    const modalPerfil = document.getElementById('modalPerfil');
+    const btnOptPerfil = document.getElementById('btnOptPerfil');
+    const btnClosePerfil = document.getElementById('btnClosePerfil');
+
+    const modalConfig = document.getElementById('modalConfig');
+    const btnOptConfig = document.getElementById('btnOptConfig');
+    const btnCloseConfig = document.getElementById('btnCloseConfig');
+
     function normalizarConstitucion(lista) {
+      if (!Array.isArray(lista)) return [];
       return lista.filter(item => {
         const txt = (item.texto || item.contenido || '').trim().toLowerCase();
         if (txt.startsWith('rdénase') || txt.startsWith('ordénase')) return false;
@@ -254,7 +511,6 @@
         let tit = (item.titulo || '').trim();
         let txt = (item.texto || item.contenido || '').trim();
 
-        // Limpieza específica para el Artículo 14 bis (quita el "5" o números extra)
         if (
           (numStr.toLowerCase().includes('14') && (numStr.toLowerCase().includes('bis') || tit.toLowerCase().includes('bis'))) ||
           txt.toLowerCase().startsWith('el trabajo en sus diversas formas')
@@ -282,116 +538,150 @@
       });
     }
 
-    /* ==========================================================================
-       INICIALIZACIÓN
-       ========================================================================== */
+    async function cargarArchivoJson(ruta) {
+      try {
+        const r = await fetch(ruta);
+        if (r.ok) return await r.json();
+      } catch (err) {
+        console.warn('Fallo primario ' + ruta, err);
+      }
+      try {
+        const r2 = await fetch(ruta + '?t=' + Date.now());
+        if (r2.ok) return await r2.json();
+      } catch (err2) {
+        console.error('Fallo total ' + ruta, err2);
+      }
+      return [];
+    }
+
     async function inicializar() {
       try {
         const [resCCyC, resCN] = await Promise.all([
-          fetch('./articulos.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch('./constitucion.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).catch(() => [])
+          cargarArchivoJson('./articulos.json'),
+          cargarArchivoJson('./constitucion.json')
         ]);
 
-        const rawCCyC = Array.isArray(resCCyC) ? resCCyC : (resCCyC.articulos || []);
-        const rawCN = Array.isArray(resCN) ? resCN : (resCN.articulos || []);
-
-        articulosCCyC = rawCCyC;
-        articulosCN = normalizarConstitucion(rawCN);
+        articulosCCyC = Array.isArray(resCCyC) ? resCCyC : (resCCyC.articulos || []);
+        articulosCN = normalizarConstitucion(Array.isArray(resCN) ? resCN : (resCN.articulos || []));
 
         const loading = document.getElementById('loadingState');
         if (loading) loading.style.display = 'none';
 
+        aplicarConfiguracionesGuardadas();
+        renderizarListaCasos();
         cambiarNorma(normaActiva, false);
       } catch (e) {
-        articlesList.innerHTML = '<p class="loading-state">Error al cargar la base normativa.</p>';
+        console.error('Error al inicializar:', e);
+        if (articlesList) {
+          articlesList.innerHTML = '<p class="loading-state">Error al cargar la base de datos. Recargá la página.</p>';
+        }
       }
     }
 
-    /* ==========================================================================
-       CAMBIO DE NORMATIVA
-       ========================================================================== */
+    function setPalette(nombreTema) {
+      document.documentElement.setAttribute('data-theme', nombreTema);
+      document.body.setAttribute('data-theme', nombreTema);
+      localStorage.setItem('suite_theme_palette', nombreTema);
+
+      const colorMap = {
+        'soft-cream': '#F8F1E7',
+        'burgundy': '#5B0F18',
+        'tiber': '#06392F',
+        'navy': '#0A122A'
+      };
+
+      const metaThemeColor = document.getElementById('metaThemeColor') || document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', colorMap[nombreTema] || '#5B0F18');
+      }
+
+      ['btnThemeCream', 'btnThemeBurgundy', 'btnThemeTiber', 'btnThemeNavy'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+
+      if (nombreTema === 'soft-cream') document.getElementById('btnThemeCream')?.classList.add('active');
+      if (nombreTema === 'burgundy') document.getElementById('btnThemeBurgundy')?.classList.add('active');
+      if (nombreTema === 'tiber') document.getElementById('btnThemeTiber')?.classList.add('active');
+      if (nombreTema === 'navy') document.getElementById('btnThemeNavy')?.classList.add('active');
+    }
+
     function cambiarNorma(norma, cerrarModal = true) {
       normaActiva = norma;
       filtroEstructura = 'TODOS';
       localStorage.setItem('suite_norma_activa', norma);
 
-      document.getElementById('cardChoiceCCYC').classList.toggle('active', norma === 'ccyc');
-      document.getElementById('cardChoiceCN').classList.toggle('active', norma === 'cn');
+      document.getElementById('cardChoiceCCYC')?.classList.toggle('active', norma === 'ccyc');
+      document.getElementById('cardChoiceCN')?.classList.toggle('active', norma === 'cn');
 
       if (norma === 'ccyc') {
-        tituloEncabezado.textContent = 'CÓDIGO CIVIL Y COMERCIAL';
-        subtituloEncabezado.textContent = 'República Argentina · Ley 26.994';
-        lblIndiceActual.textContent = 'Todo el Código';
+        if (tituloEncabezado) tituloEncabezado.textContent = 'CÓDIGO CIVIL Y COMERCIAL';
+        if (subtituloEncabezado) subtituloEncabezado.textContent = 'República Argentina · Ley 26.994';
+        if (lblIndiceActual) lblIndiceActual.textContent = 'Todo el Código';
       } else {
-        tituloEncabezado.textContent = 'CONSTITUCIÓN NACIONAL';
-        subtituloEncabezado.textContent = 'República Argentina · Publicación Oficial';
-        lblIndiceActual.textContent = 'Toda la Constitución';
+        if (tituloEncabezado) tituloEncabezado.textContent = 'CONSTITUCIÓN NACIONAL';
+        if (subtituloEncabezado) subtituloEncabezado.textContent = 'República Argentina · Texto Oficial';
+        if (lblIndiceActual) lblIndiceActual.textContent = 'Toda la Constitución';
       }
 
-      inputBusqueda.value = '';
+      if (inputBusqueda) inputBusqueda.value = '';
       aplicarFiltrosYRenderizar();
       construirIndice();
 
-      if (cerrarModal) {
+      if (cerrarModal && modalBiblioteca) {
         modalBiblioteca.classList.remove('active');
       }
     }
 
-    /* ==========================================================================
-       CONSTRUCCIÓN DEL ÍNDICE
-       ========================================================================== */
     function construirIndice() {
+      if (!indiceContainer) return;
       indiceContainer.innerHTML = '';
-      tituloModalIndice.textContent = normaActiva === 'ccyc' ? 'Índice · Código Civil y Comercial' : 'Índice · Constitución Nacional';
+      if (tituloModalIndice) {
+        tituloModalIndice.textContent = normaActiva === 'ccyc' ? 'Índice · Código Civil y Comercial' : 'Índice · Constitución Nacional';
+      }
 
       if (normaActiva === 'ccyc') {
         const estructuraCCyC = [
-          { clave: 'TODOS', titulo: '📚 Todo el Código Completo', desc: 'Ver todos los artículos en orden numérico.' },
-          { clave: 'TITULO PRELIMINAR', titulo: 'Título Preliminar', desc: 'Arts. 1 al 18 · Fuentes, interpretación y ejercicio de los derechos.' },
-          { clave: 'LIBRO PRIMERO', titulo: 'Libro I · Parte General', desc: 'Arts. 19 al 400 · Personas humanas y jurídicas, bienes y actos.' },
+          { clave: 'TODOS', titulo: 'Todo el Código', desc: 'Ver todos los artículos en orden correlativo.' },
+          { clave: 'TITULO PRELIMINAR', titulo: 'Título Preliminar', desc: 'Arts. 1 al 18 · Principios, aplicación y ejercicio de derechos.' },
+          { clave: 'LIBRO PRIMERO', titulo: 'Libro I · Parte General', desc: 'Arts. 19 al 400 · Personas, bienes y hechos jurídicos.' },
           { clave: 'LIBRO SEGUNDO', titulo: 'Libro II · Relaciones de Familia', desc: 'Arts. 401 al 723 · Matrimonio, uniones convivenciales y filiación.' },
-          { clave: 'LIBRO TERCERO', titulo: 'Libro III · Derechos Personales', desc: 'Arts. 724 al 1881 · Obligaciones, contratos en general y especiales.' },
-          { clave: 'LIBRO CUARTO', titulo: 'Libro IV · Derechos Reales', desc: 'Arts. 1882 al 2276 · Posesión, dominio, propiedad horizontal e hipoteca.' },
-          { clave: 'LIBRO QUINTO', titulo: 'Libro V · Transmisión por Causa de Muerte', desc: 'Arts. 2277 al 2531 · Sucesiones, legítima hereditaria y testamentos.' },
+          { clave: 'LIBRO TERCERO', titulo: 'Libro III · Derechos Personales', desc: 'Arts. 724 al 1881 · Obligaciones, contratos en general y de consumo.' },
+          { clave: 'LIBRO CUARTO', titulo: 'Libro IV · Derechos Reales', desc: 'Arts. 1882 al 2276 · Posesión, dominio, PH e hipoteca.' },
+          { clave: 'LIBRO QUINTO', titulo: 'Libro V · Sucesiones', desc: 'Arts. 2277 al 2531 · Herencia, porción legítima y testamentos.' },
           { clave: 'LIBRO SEXTO', titulo: 'Libro VI · Disposiciones Comunes', desc: 'Arts. 2532 al 2671 · Prescripción, privilegios y DIP.' }
         ];
 
         estructuraCCyC.forEach(item => {
           const div = document.createElement('div');
           div.className = 'index-item-card' + (filtroEstructura === item.clave ? ' active' : '');
-          div.innerHTML = `
-            <h4>${item.titulo}</h4>
-            <p>${item.desc}</p>
-          `;
+          div.innerHTML = `<h4>${item.titulo}</h4><p>${item.desc}</p>`;
           div.onclick = () => {
             filtroEstructura = item.clave;
-            lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
+            if (lblIndiceActual) lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
             aplicarFiltrosYRenderizar();
-            modalIndice.classList.remove('active');
+            modalIndice?.classList.remove('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
           indiceContainer.appendChild(div);
         });
       } else {
         const estructuraCN = [
-          { clave: 'TODOS', titulo: '📜 Constitución Completa', desc: 'Texto integral sancionado y reformado en 1994.' },
-          { clave: 'PREAMBULO', titulo: 'Preámbulo', desc: 'Texto fundacional de los representantes de la Nación.' },
-          { clave: 'PRIMERA PARTE', titulo: 'Primera Parte · Declaraciones, Derechos y Garantías', desc: 'Arts. 1 al 43 · Dogmática constitucional y nuevos derechos.' },
+          { clave: 'TODOS', titulo: 'Constitución Completa', desc: 'Texto completo de la Constitución Nacional.' },
+          { clave: 'PREAMBULO', titulo: 'Preámbulo', desc: 'Texto histórico fundacional.' },
+          { clave: 'PRIMERA PARTE', titulo: 'Primera Parte · Derechos y Garantías', desc: 'Arts. 1 al 43 · Declaraciones, derechos y garantías constitucionales.' },
           { clave: 'SEGUNDA PARTE', titulo: 'Segunda Parte · Autoridades de la Nación', desc: 'Arts. 44 al 129 · Poder Legislativo, Ejecutivo, Judicial y Provincias.' }
         ];
 
         estructuraCN.forEach(item => {
           const div = document.createElement('div');
           div.className = 'index-item-card' + (filtroEstructura === item.clave ? ' active' : '');
-          div.innerHTML = `
-            <h4>${item.titulo}</h4>
-            <p>${item.desc}</p>
-          `;
+          div.innerHTML = `<h4>${item.titulo}</h4><p>${item.desc}</p>`;
           div.onclick = () => {
             filtroEstructura = item.clave;
-            lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
+            if (lblIndiceActual) lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
             aplicarFiltrosYRenderizar();
-            modalIndice.classList.remove('active');
+            modalIndice?.classList.remove('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
           indiceContainer.appendChild(div);
@@ -399,49 +689,193 @@
       }
     }
 
-    /* ==========================================================================
-       MODO LECTOR VS BUSCADOR
-       ========================================================================== */
-    btnBuscador.addEventListener('click', () => {
+    btnBuscador?.addEventListener('click', () => {
       modoLectorActivo = false;
       btnBuscador.classList.add('active');
-      btnLector.classList.remove('active');
-      panelBuscador.style.display = 'block';
-      floatingReaderBar.style.display = 'none';
+      btnLector?.classList.remove('active');
+      if (panelBuscador) panelBuscador.style.display = 'block';
+      if (floatingReaderBar) floatingReaderBar.style.display = 'none';
+      if (actionTriggerWrapper) actionTriggerWrapper.style.setProperty('display', 'flex', 'important');
       renderizarArticulos();
     });
 
-    btnLector.addEventListener('click', () => {
+    btnLector?.addEventListener('click', () => {
       modoLectorActivo = true;
       btnLector.classList.add('active');
-      btnBuscador.classList.remove('active');
-      panelBuscador.style.display = 'none';
-      floatingReaderBar.style.display = 'flex';
+      btnBuscador?.classList.remove('active');
+      if (panelBuscador) panelBuscador.style.display = 'none';
+      if (floatingReaderBar) floatingReaderBar.style.display = 'flex';
+      if (actionTriggerWrapper) actionTriggerWrapper.style.setProperty('display', 'none', 'important');
       renderizarArticulos();
     });
 
-    btnAbrirIndice.addEventListener('click', () => {
+    btnAbrirIndice?.addEventListener('click', () => {
       construirIndice();
-      modalIndice.classList.add('active');
+      modalIndice?.classList.add('active');
     });
 
-    btnCloseIndice.addEventListener('click', () => modalIndice.classList.remove('active'));
-    modalIndice.addEventListener('click', (e) => {
+    btnCloseIndice?.addEventListener('click', () => modalIndice?.classList.remove('active'));
+    modalIndice?.addEventListener('click', (e) => {
       if (e.target === modalIndice) modalIndice.classList.remove('active');
     });
 
-    btnAbrirBiblioteca.addEventListener('click', () => modalBiblioteca.classList.add('active'));
-    btnCloseBiblioteca.addEventListener('click', () => modalBiblioteca.classList.remove('active'));
-    modalBiblioteca.addEventListener('click', (e) => {
+    btnAbrirBiblioteca?.addEventListener('click', () => modalBiblioteca?.classList.add('active'));
+    btnCloseBiblioteca?.addEventListener('click', () => modalBiblioteca?.classList.remove('active'));
+    modalBiblioteca?.addEventListener('click', (e) => {
       if (e.target === modalBiblioteca) modalBiblioteca.classList.remove('active');
     });
 
-    /* ==========================================================================
-       FILTROS Y RENDERIZADO
-       ========================================================================== */
+    btnActionTrigger?.addEventListener('click', () => actionSheetBackdrop?.classList.add('active'));
+    btnCloseActionSheet?.addEventListener('click', () => actionSheetBackdrop?.classList.remove('active'));
+    actionSheetBackdrop?.addEventListener('click', (e) => {
+      if (e.target === actionSheetBackdrop) actionSheetBackdrop.classList.remove('active');
+    });
+
+    btnOptCasos?.addEventListener('click', () => {
+      actionSheetBackdrop?.classList.remove('active');
+      modalCasos?.classList.add('active');
+    });
+    btnCloseCasos?.addEventListener('click', () => modalCasos?.classList.remove('active'));
+    modalCasos?.addEventListener('click', (e) => {
+      if (e.target === modalCasos) modalCasos.classList.remove('active');
+    });
+
+    btnOptPerfil?.addEventListener('click', () => {
+      actionSheetBackdrop?.classList.remove('active');
+      modalPerfil?.classList.add('active');
+    });
+    btnClosePerfil?.addEventListener('click', () => modalPerfil?.classList.remove('active'));
+    modalPerfil?.addEventListener('click', (e) => {
+      if (e.target === modalPerfil) modalPerfil.classList.remove('active');
+    });
+
+    btnOptConfig?.addEventListener('click', () => {
+      actionSheetBackdrop?.classList.remove('active');
+      modalConfig?.classList.add('active');
+    });
+    btnCloseConfig?.addEventListener('click', () => modalConfig?.classList.remove('active'));
+    modalConfig?.addEventListener('click', (e) => {
+      if (e.target === modalConfig) modalConfig.classList.remove('active');
+    });
+
+    btnAbrirGuiaInstalacion?.addEventListener('click', () => {
+      modalConfig?.classList.remove('active');
+      modalInstalar?.classList.add('active');
+    });
+    btnCloseModal?.addEventListener('click', () => modalInstalar?.classList.remove('active'));
+    modalInstalar?.addEventListener('click', (e) => {
+      if (e.target === modalInstalar) modalInstalar.classList.remove('active');
+    });
+
+    function renderizarListaCasos() {
+      if (!casesSelectorList) return;
+      casesSelectorList.innerHTML = CASOS_PRACTICOS.map(c => `
+        <div class="case-card-pick" onclick="mostrarDetalleCaso(${c.id})">
+          <span class="case-tag">${c.rama}</span>
+          <h4>${c.titulo}</h4>
+          <p>${c.hecho.slice(0, 115)}...</p>
+        </div>
+      `).join('');
+    }
+
+    function mostrarDetalleCaso(id) {
+      const caso = CASOS_PRACTICOS.find(c => c.id === id);
+      if (!caso) return;
+
+      const tagRama = document.getElementById('detailCaseRama');
+      const tit = document.getElementById('detailCaseTitulo');
+      const hecho = document.getElementById('detailCaseHecho');
+      const enc = document.getElementById('detailCaseEncuadre');
+      const chipsContainer = document.getElementById('detailCaseChips');
+
+      if (tagRama) tagRama.textContent = caso.rama;
+      if (tit) tit.textContent = caso.titulo;
+      if (hecho) hecho.textContent = caso.hecho;
+      if (enc) enc.textContent = caso.encuadre;
+
+      if (chipsContainer) {
+        chipsContainer.innerHTML = caso.articulos.map(artNum => `
+          <button class="chip-art-link" onclick="navegarCasoArticulo('${caso.normaAsociada}', '${artNum}')">
+            Ver Art. ${artNum}
+          </button>
+        `).join('');
+      }
+
+      if (casesSelectorList) casesSelectorList.style.display = 'none';
+      if (caseDetailCard) caseDetailCard.style.display = 'block';
+    }
+
+    btnBackCases?.addEventListener('click', () => {
+      if (caseDetailCard) caseDetailCard.style.display = 'none';
+      if (casesSelectorList) casesSelectorList.style.display = 'grid';
+    });
+
+    function navegarCasoArticulo(norma, artNum) {
+      modalCasos?.classList.remove('active');
+      if (norma !== normaActiva) {
+        cambiarNorma(norma, false);
+      }
+      irArticulo(artNum);
+    }
+
+    const btnFontSmall = document.getElementById('btnFontSmall');
+    const btnFontMed = document.getElementById('btnFontMed');
+    const btnFontLarge = document.getElementById('btnFontLarge');
+
+    const btnFontSans = document.getElementById('btnFontSans');
+    const btnFontClasica = document.getElementById('btnFontClasica');
+    const btnFontEditorial = document.getElementById('btnFontEditorial');
+
+    function aplicarConfiguracionesGuardadas() {
+      const savedTheme = localStorage.getItem('suite_theme_palette') || 'burgundy';
+      const savedSize = localStorage.getItem('suite_font_size') || 'medium';
+      const savedFont = localStorage.getItem('suite_font_family') || 'sans';
+
+      setPalette(savedTheme);
+      setFontSize(savedSize, false);
+      setFontFamily(savedFont, false);
+    }
+
+    function setFontSize(val, guardar = true) {
+      document.documentElement.setAttribute('data-size', val);
+      document.body.setAttribute('data-size', val);
+      if (guardar) localStorage.setItem('suite_font_size', val);
+
+      [btnFontSmall, btnFontMed, btnFontLarge].forEach(b => b?.classList.remove('active'));
+      if (val === 'small') btnFontSmall?.classList.add('active');
+      if (val === 'medium') btnFontMed?.classList.add('active');
+      if (val === 'large') btnFontLarge?.classList.add('active');
+    }
+
+    function setFontFamily(val, guardar = true) {
+      document.documentElement.setAttribute('data-font', val);
+      document.body.setAttribute('data-font', val);
+      if (guardar) localStorage.setItem('suite_font_family', val);
+
+      [btnFontSans, btnFontClasica, btnFontEditorial].forEach(b => b?.classList.remove('active'));
+      if (val === 'sans') btnFontSans?.classList.add('active');
+      if (val === 'clasica') btnFontClasica?.classList.add('active');
+      if (val === 'editorial') btnFontEditorial?.classList.add('active');
+    }
+
+    btnFontSmall?.addEventListener('click', () => setFontSize('small'));
+    btnFontMed?.addEventListener('click', () => setFontSize('medium'));
+    btnFontLarge?.addEventListener('click', () => setFontSize('large'));
+
+    btnFontSans?.addEventListener('click', () => setFontFamily('sans'));
+    btnFontClasica?.addEventListener('click', () => setFontFamily('clasica'));
+    btnFontEditorial?.addEventListener('click', () => setFontFamily('editorial'));
+
+    document.getElementById('btnClearStorage')?.addEventListener('click', () => {
+      if (confirm('¿Deseas restablecer los artículos fijados y volver a la configuración original?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    });
+
     function aplicarFiltrosYRenderizar() {
       const base = normaActiva === 'ccyc' ? articulosCCyC : articulosCN;
-      const query = inputBusqueda.value.trim().toLowerCase();
+      const query = (inputBusqueda?.value || '').trim().toLowerCase();
 
       let resultado = base;
       if (filtroEstructura !== 'TODOS') {
@@ -456,25 +890,23 @@
       }
 
       if (query) {
-        btnClearSearch.style.display = 'block';
+        if (btnClearSearch) btnClearSearch.style.display = 'block';
         resultado = resultado.filter(a => {
-          const num = String(a.numero).toLowerCase();
+          const num = String(a.numero || '').toLowerCase();
           const matchNum = num === query || num.startsWith(query);
           const matchTitulo = a.titulo && a.titulo.toLowerCase().includes(query);
           const matchTexto = (a.texto || '').toLowerCase().includes(query);
           return matchNum || matchTitulo || matchTexto;
         });
       } else {
-        btnClearSearch.style.display = 'none';
+        if (btnClearSearch) btnClearSearch.style.display = 'none';
       }
 
       articulosFiltrados = resultado;
-      lblTotalArticulos.textContent = `${resultado.length} artículos`;
-      
-      if (filtroEstructura !== 'TODOS') {
-        lblFiltroActivo.textContent = `(Filtrado por: ${filtroEstructura})`;
-      } else {
-        lblFiltroActivo.textContent = '';
+      if (lblTotalArticulos) lblTotalArticulos.textContent = `${resultado.length} artículos`;
+
+      if (lblFiltroActivo) {
+        lblFiltroActivo.textContent = filtroEstructura !== 'TODOS' ? `· ${filtroEstructura}` : '';
       }
 
       limite = 25;
@@ -483,9 +915,11 @@
     }
 
     function renderizarArticulos() {
+      if (!articlesList) return;
+
       if (articulosFiltrados.length === 0) {
-        articlesList.innerHTML = '<p class="loading-state">No se encontraron artículos.</p>';
-        btnLoadMore.style.display = 'none';
+        articlesList.innerHTML = '<p class="loading-state">No se encontraron artículos con ese criterio de búsqueda.</p>';
+        if (btnLoadMore) btnLoadMore.style.display = 'none';
         return;
       }
 
@@ -496,16 +930,7 @@
         const texto = art.texto || '';
         const truncar = !modoLectorActivo && texto.length > 280;
 
-        let encabezado = '';
-        if (art.esPreambulo) {
-          encabezado = 'PREÁMBULO';
-        } else if (String(art.numero).toLowerCase().includes('bis')) {
-          // Formato limpio para el Artículo 14 bis (sin el símbolo °)
-          encabezado = `ARTÍCULO ${art.numero} ${art.titulo ? '- ' + art.titulo : ''}`.trim();
-        } else {
-          encabezado = `ARTÍCULO ${art.numero}° ${art.titulo ? '- ' + art.titulo : ''}`.trim();
-        }
-
+        const encabezado = art.esPreambulo ? 'PREÁMBULO' : (String(art.numero).toLowerCase().includes('bis') ? `ARTÍCULO ${art.numero}` : `ARTÍCULO ${art.numero}°`);
         const tagSeccion = (art.libro || art.parte || (art.esPreambulo ? 'PREÁMBULO' : 'NORMATIVA')).toUpperCase();
 
         return `
@@ -513,16 +938,16 @@
             <div class="art-card-header">
               <div>
                 <span class="art-badge-tag">${tagSeccion}</span>
-                <h2 class="art-card-title">${encabezado}</h2>
+                <h2 class="art-card-title">${encabezado} ${art.titulo ? '· ' + art.titulo : ''}</h2>
                 <span class="art-card-sub">${normaActiva === 'ccyc' ? 'Código Civil y Comercial de la Nación' : 'Constitución de la Nación Argentina'}</span>
               </div>
               <div class="art-actions">
                 <button class="btn-action ${esFijado ? 'active' : ''}" onclick="togglePin('${art.numero}')">
-                  ${esFijado ? '★ Pinned' : '☆ Pin'}
+                  ${esFijado ? 'Fijado' : 'Fijar'}
                 </button>
                 <button class="btn-action" onclick="copiarArticulo('${art.numero}')">Copiar</button>
-                <button class="btn-action btn-wa" onclick="compartirWhatsapp('${art.numero}')">
-                  <span>📲</span> WhatsApp
+                <button class="btn-action" onclick="compartirWhatsapp('${art.numero}')">
+                  Compartir
                 </button>
               </div>
             </div>
@@ -533,14 +958,16 @@
 
             ${truncar ? `
               <button class="btn-expand" id="btn-exp-${art.numero}" onclick="expandirTexto('${art.numero}')">
-                ▼ Leer artículo completo
+                Leer artículo completo
               </button>
             ` : ''}
           </article>
         `;
       }).join('');
 
-      btnLoadMore.style.display = articulosFiltrados.length > limite ? 'inline-block' : 'none';
+      if (btnLoadMore) {
+        btnLoadMore.style.display = articulosFiltrados.length > limite ? 'inline-block' : 'none';
+      }
     }
 
     function expandirTexto(num) {
@@ -550,26 +977,17 @@
       if (btn) btn.style.display = 'none';
     }
 
-    if (btnLoadMore) {
-      btnLoadMore.addEventListener('click', () => {
-        limite += 25;
-        renderizarArticulos();
-      });
-    }
+    btnLoadMore?.addEventListener('click', () => {
+      limite += 25;
+      renderizarArticulos();
+    });
 
-    /* ==========================================================================
-       BUSCADOR
-       ========================================================================== */
-    inputBusqueda.addEventListener('input', aplicarFiltrosYRenderizar);
-
-    btnClearSearch.addEventListener('click', () => {
-      inputBusqueda.value = '';
+    inputBusqueda?.addEventListener('input', aplicarFiltrosYRenderizar);
+    btnClearSearch?.addEventListener('click', () => {
+      if (inputBusqueda) inputBusqueda.value = '';
       aplicarFiltrosYRenderizar();
     });
 
-    /* ==========================================================================
-       PINS (ACCESOS RÁPIDOS)
-       ========================================================================== */
     function togglePin(num) {
       const str = String(num);
       if (pinnedArticulos.includes(str)) {
@@ -583,6 +1001,8 @@
     }
 
     function renderizarPins() {
+      if (!pinnedContainer || !qaEmptyText) return;
+
       if (pinnedArticulos.length === 0) {
         qaEmptyText.style.display = 'block';
         pinnedContainer.style.display = 'none';
@@ -597,7 +1017,7 @@
       `).join('');
     }
 
-    document.getElementById('btnResetPins').addEventListener('click', () => {
+    document.getElementById('btnResetPins')?.addEventListener('click', () => {
       pinnedArticulos = [];
       localStorage.removeItem('ccyc_pinned');
       renderizarPins();
@@ -606,99 +1026,48 @@
 
     function irArticulo(num) {
       if (modoLectorActivo) {
-        btnBuscador.click();
+        btnBuscador?.click();
       }
-      inputBusqueda.value = num === 'Preámbulo' ? 'Preámbulo' : num;
+      if (inputBusqueda) {
+        inputBusqueda.value = num === 'Preámbulo' ? 'Preámbulo' : num;
+      }
       aplicarFiltrosYRenderizar();
+
+      setTimeout(() => {
+        const el = document.getElementById(`card-${num}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
     }
 
-    /* ==========================================================================
-       COPIAR Y COMPARTIR
-       ========================================================================== */
     function copiarArticulo(num) {
       const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
       const encabezado = art.esPreambulo ? 'PREÁMBULO' : (String(art.numero).toLowerCase().includes('bis') ? `ARTÍCULO ${art.numero}` : `ARTÍCULO ${art.numero}°`);
-      const texto = `${encabezado} ${art.titulo ? '- ' + art.titulo : ''}\n\n${art.texto}\n(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})`;
+      const texto = `${encabezado} ${art.titulo ? '· ' + art.titulo : ''}\n\n${art.texto}\n\n(Fuente: ${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})`;
       navigator.clipboard.writeText(texto);
-      alert('Artículo copiado al portapapeles.');
+      alert('Artículo copiado.');
     }
 
     function compartirWhatsapp(num) {
       const art = (normaActiva === 'ccyc' ? articulosCCyC : articulosCN).find(a => String(a.numero) === String(num));
       if (!art) return;
       const encabezado = art.esPreambulo ? 'PREÁMBULO' : (String(art.numero).toLowerCase().includes('bis') ? `ARTÍCULO ${art.numero}` : `ARTÍCULO ${art.numero}°`);
-      const texto = `*${encabezado} ${art.titulo ? '- ' + art.titulo : ''}*\n\n${art.texto}\n\n_(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})_`;
+      const texto = `*${encabezado} ${art.titulo ? '· ' + art.titulo : ''}*\n\n${art.texto}\n\n_(${normaActiva === 'ccyc' ? 'CCyC Ley 26.994' : 'Constitución Nacional'})_`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* ==========================================================================
-       TEMA CLARO / OSCURO
-       ========================================================================== */
-    const btnTheme = document.getElementById('btnThemeToggle');
-    const temaGuardado = localStorage.getItem('ccyc_theme') || 'light';
-    document.body.setAttribute('data-theme', temaGuardado);
-    btnTheme.textContent = temaGuardado === 'dark' ? '🌙' : '☀️';
-
-    btnTheme.addEventListener('click', () => {
-      const actual = document.body.getAttribute('data-theme');
-      const siguiente = actual === 'dark' ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', siguiente);
-      localStorage.setItem('ccyc_theme', siguiente);
-      btnTheme.textContent = siguiente === 'dark' ? '🌙' : '☀️';
-    });
-
-    /* ==========================================================================
-       MODAL DE INSTALACIÓN
-       ========================================================================== */
-    btnInstalar.addEventListener('click', () => modalInstalar.classList.add('active'));
-    btnCloseModal.addEventListener('click', () => modalInstalar.classList.remove('active'));
-    modalInstalar.addEventListener('click', (e) => {
-      if (e.target === modalInstalar) modalInstalar.classList.remove('active');
-    });
-
-    /* ==========================================================================
-       SERVICE WORKER
-       ========================================================================== */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').then((registration) => {
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                window.location.reload();
-              }
-            });
-          });
-        }).catch(() => {});
-
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
-          }
-        });
+        navigator.serviceWorker.register('./service-worker.js').catch(() => { });
       });
     }
 
-    /* ==========================================================================
-       ESCUDO ANTI-INSPECCIÓN
-       ========================================================================== */
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (
-        e.keyCode === 123 || 
-        (e.ctrlKey && (e.key === 'u' || e.key === 's')) || 
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    window.addEventListener('DOMContentLoaded', inicializar);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', inicializar);
+    } else {
+      inicializar();
+    }
   </script>
 </body>
+
 </html>
