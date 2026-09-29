@@ -6,9 +6,10 @@
 :root,
 [data-theme="soft-cream"] {
   --bg-page: #F8F1E7;
+  --bg-modal: #F8F1E7;
   --bg-gradient: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.6) 0%, rgba(248, 241, 231, 1) 75%);
   --glass-card: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(91, 15, 24, 0.12);
+  --glass-border: rgba(91, 15, 24, 0.14);
   --glass-shadow: 0 10px 30px -5px rgba(91, 15, 24, 0.05), 0 4px 12px rgba(0, 0, 0, 0.02);
 
   --text-primary: #5B0F18;
@@ -26,6 +27,7 @@
 /* 2. BURGUNDY WINE (#5B0F18) · Cuero de tribunal */
 [data-theme="burgundy"] {
   --bg-page: #5B0F18;
+  --bg-modal: #4A0B13;
   --bg-gradient: radial-gradient(circle at 50% 0%, #6E1520 0%, #5B0F18 60%, #3D090F 100%);
   --glass-card: rgba(61, 9, 15, 0.78);
   --glass-border: rgba(248, 241, 231, 0.16);
@@ -46,6 +48,7 @@
 /* 3. TIBER GREEN (#06392F) · Verde biblioteca */
 [data-theme="tiber"] {
   --bg-page: #06392F;
+  --bg-modal: #042921;
   --bg-gradient: radial-gradient(circle at 50% 0%, #0B4A3D 0%, #06392F 60%, #03211B 100%);
   --glass-card: rgba(3, 33, 27, 0.75);
   --glass-border: rgba(244, 241, 234, 0.16);
@@ -66,6 +69,7 @@
 /* 4. MIDNIGHT NAVY (#0A122A) · Azul noche institucional */
 [data-theme="navy"] {
   --bg-page: #0A122A;
+  --bg-modal: #060B1A;
   --bg-gradient: radial-gradient(circle at 50% 0%, #13224E 0%, #0A122A 60%, #040814 100%);
   --glass-card: rgba(7, 13, 31, 0.78);
   --glass-border: rgba(248, 241, 231, 0.16);
@@ -84,7 +88,23 @@
 }
 
 /* ==========================================================================
-   TIPOGRAFÍAS GLOBALES (CAMBIO REAL EN TODA LA PLATAFORMA)
+   ESCALAS DE TAMAÑO GLOBALES (AFECTAN A TODA LA PÁGINA)
+   ========================================================================== */
+html,
+[data-size="medium"] {
+  font-size: 16px !important;
+}
+
+[data-size="small"] {
+  font-size: 14px !important;
+}
+
+[data-size="large"] {
+  font-size: 18px !important;
+}
+
+/* ==========================================================================
+   TIPOGRAFÍAS GLOBALES
    ========================================================================== */
 [data-font="sans"] * {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -99,37 +119,7 @@
 }
 
 /* ==========================================================================
-   ESCALAS DE LECTURA (TAMAÑOS DEFINITIVOS DE IMPACTO DIRECTO)
-   ========================================================================== */
-[data-size="small"] .art-card-body {
-  font-size: 0.82rem !important;
-  line-height: 1.55 !important;
-}
-
-[data-size="small"] .art-card-title {
-  font-size: 1.02rem !important;
-}
-
-[data-size="medium"] .art-card-body {
-  font-size: 0.98rem !important;
-  line-height: 1.75 !important;
-}
-
-[data-size="medium"] .art-card-title {
-  font-size: 1.15rem !important;
-}
-
-[data-size="large"] .art-card-body {
-  font-size: 1.18rem !important;
-  line-height: 1.9 !important;
-}
-
-[data-size="large"] .art-card-title {
-  font-size: 1.3rem !important;
-}
-
-/* ==========================================================================
-   RESET & PANTALLA COMPLETA
+   RESET & LAYOUT BASE
    ========================================================================== */
 * {
   box-sizing: border-box;
@@ -167,6 +157,12 @@ body {
   padding-right: max(env(safe-area-inset-right), 1.25rem) !important;
 }
 
+/* Congela el scroll del fondo cuando un modal está abierto */
+body.modal-open {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
 .app-container {
   max-width: 1040px;
   width: 100%;
@@ -196,8 +192,8 @@ body {
 .logo-box {
   background: var(--text-primary);
   color: var(--bg-page);
-  width: 42px;
-  height: 42px;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -494,7 +490,7 @@ body {
 }
 
 .art-card-body-wrapper.truncated {
-  max-height: 125px;
+  max-height: 8rem;
 }
 
 .art-card-body-wrapper.truncated::after {
@@ -503,13 +499,13 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 55px;
+  height: 3.5rem;
   background: var(--fade-gradient);
   pointer-events: none;
 }
 
 .art-card-body {
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   line-height: 1.75;
   color: var(--text-body);
   white-space: pre-line;
@@ -632,9 +628,10 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 10, 8, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 9998;
   align-items: flex-end;
   justify-content: center;
@@ -656,15 +653,15 @@ body {
 }
 
 .action-sheet-panel {
-  background: var(--bg-page);
+  background: var(--bg-modal);
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
   border: 1px solid var(--glass-border);
   border-bottom: none;
   width: 100%;
   max-width: 500px;
-  padding: 1.25rem 1.5rem 2.25rem 1.5rem;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+  padding: 1.25rem 1.5rem calc(max(env(safe-area-inset-bottom), 15px) + 1.5rem) 1.5rem;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   animation: slideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -776,7 +773,7 @@ body {
 }
 
 /* ==========================================================================
-   MODALES
+   MODALES (AISLAMIENTO TOTAL Y SCROLL SUAVE)
    ========================================================================== */
 .modal-backdrop {
   display: none;
@@ -785,10 +782,11 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 10, 8, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 9999;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 10000;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
@@ -812,18 +810,29 @@ body {
 }
 
 .modal-box {
-  background: var(--bg-page);
+  background: var(--bg-modal);
   border-radius: 20px;
   width: 100%;
-  max-width: 460px;
-  padding: 1.75rem;
+  max-width: 480px;
+  padding: 1.6rem;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+}
+
+/* Modal deslizable fluido en celular */
+.modal-box-scrollable {
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-box-large {
   max-width: 620px;
-  max-height: 82vh;
+  max-height: 85vh;
+  max-height: 85dvh;
   display: flex;
   flex-direction: column;
 }
@@ -833,6 +842,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.25rem;
+  flex-shrink: 0;
 }
 
 .modal-top h3 {
@@ -859,11 +869,12 @@ body {
 
 .modal-scroll-area {
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-right: 0.4rem;
 }
 
 /* ==========================================================================
-   CONFIGURACIÓN (PALETAS, TIPOGRAFÍAS Y ESCALAS)
+   CONFIGURACIÓN (SELECTOR DE FUENTES Y PALETAS SIN DESBORDE)
    ========================================================================== */
 .config-options-wrapper {
   display: flex;
@@ -1001,9 +1012,9 @@ body {
   background: var(--glass-card);
   color: var(--text-primary);
   border: 1px solid var(--glass-border);
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 10px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1017,11 +1028,11 @@ body {
 .btn-danger-outline {
   width: 100%;
   background: transparent;
-  color: #B91C1C;
-  border: 1px solid rgba(185, 28, 28, 0.25);
-  padding: 0.7rem 1rem;
+  color: #E63946;
+  border: 1px solid rgba(230, 57, 70, 0.3);
+  padding: 0.75rem 1rem;
   border-radius: 10px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -1365,7 +1376,7 @@ body {
 }
 
 /* ==========================================================================
-   ADAPTACIÓN RESPONSIVA Y MÓVIL (iOS / ANDROID)
+   ADAPTACIÓN RESPONSIVA Y MÓVIL
    ========================================================================== */
 @media (max-width: 768px) {
   body {
@@ -1451,5 +1462,10 @@ body {
   .btn-action {
     padding: 0.35rem 0.7rem;
     font-size: 0.74rem;
+  }
+
+  .modal-box {
+    padding: 1.35rem 1.15rem;
+    border-radius: 18px;
   }
 }
