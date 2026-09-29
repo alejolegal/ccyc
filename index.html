@@ -21,7 +21,7 @@
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="./styles.css?v=15.0.0">
+  <link rel="stylesheet" href="./styles.css?v=16.0.0">
 </head>
 
 <body data-theme="burgundy" data-font="sans" data-size="medium">
@@ -230,8 +230,9 @@
     </div>
   </div>
 
+  <!-- Modal: Configuración Integral con Scroll Fluido y Aislamiento Completo -->
   <div class="modal-backdrop" id="modalConfig">
-    <div class="modal-box">
+    <div class="modal-box modal-box-scrollable">
       <div class="modal-top">
         <div>
           <h3>Configuración</h3>
@@ -285,8 +286,8 @@
         </div>
 
         <div class="config-row">
-          <label>Tamaño de texto en artículos:</label>
-          <div class="btn-group-toggle">
+          <label>Tamaño de texto en toda la app:</label>
+          <div class="btn-group-toggle font-toggle-grid">
             <button class="cfg-btn" id="btnFontSmall">Pequeña</button>
             <button class="cfg-btn active" id="btnFontMed">Mediana</button>
             <button class="cfg-btn" id="btnFontLarge">Grande</button>
@@ -309,7 +310,7 @@
   </div>
 
   <div class="modal-backdrop" id="modalBiblioteca">
-    <div class="modal-box">
+    <div class="modal-box modal-box-scrollable">
       <div class="modal-top">
         <div>
           <h3>Biblioteca</h3>
@@ -361,7 +362,7 @@
   </div>
 
   <div class="modal-backdrop" id="modalInstalar">
-    <div class="modal-box">
+    <div class="modal-box modal-box-scrollable">
       <div class="modal-top">
         <div>
           <h3>Instalar en el Celular</h3>
@@ -499,6 +500,22 @@
     const btnOptConfig = document.getElementById('btnOptConfig');
     const btnCloseConfig = document.getElementById('btnCloseConfig');
 
+    // Gestión del bloqueo de scroll de fondo (scroll lock)
+    function abrirModal(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.add('active');
+      document.body.classList.add('modal-open');
+    }
+
+    function cerrarModal(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.remove('active');
+      const modalesAbiertos = document.querySelectorAll('.modal-backdrop.active, .action-sheet-backdrop.active');
+      if (modalesAbiertos.length === 0) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
     function normalizarConstitucion(lista) {
       if (!Array.isArray(lista)) return [];
       return lista.filter(item => {
@@ -606,7 +623,7 @@
       if (nombreTema === 'navy') document.getElementById('btnThemeNavy')?.classList.add('active');
     }
 
-    function cambiarNorma(norma, cerrarModal = true) {
+    function cambiarNorma(norma, cerrar = true) {
       normaActiva = norma;
       filtroEstructura = 'TODOS';
       localStorage.setItem('suite_norma_activa', norma);
@@ -628,8 +645,8 @@
       aplicarFiltrosYRenderizar();
       construirIndice();
 
-      if (cerrarModal && modalBiblioteca) {
-        modalBiblioteca.classList.remove('active');
+      if (cerrar && modalBiblioteca) {
+        cerrarModal(modalBiblioteca);
       }
     }
 
@@ -660,7 +677,7 @@
             filtroEstructura = item.clave;
             if (lblIndiceActual) lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
             aplicarFiltrosYRenderizar();
-            modalIndice?.classList.remove('active');
+            cerrarModal(modalIndice);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
           indiceContainer.appendChild(div);
@@ -681,7 +698,7 @@
             filtroEstructura = item.clave;
             if (lblIndiceActual) lblIndiceActual.textContent = item.titulo.split('·')[0].trim();
             aplicarFiltrosYRenderizar();
-            modalIndice?.classList.remove('active');
+            cerrarModal(modalIndice);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           };
           indiceContainer.appendChild(div);
@@ -711,60 +728,60 @@
 
     btnAbrirIndice?.addEventListener('click', () => {
       construirIndice();
-      modalIndice?.classList.add('active');
+      abrirModal(modalIndice);
     });
 
-    btnCloseIndice?.addEventListener('click', () => modalIndice?.classList.remove('active'));
+    btnCloseIndice?.addEventListener('click', () => cerrarModal(modalIndice));
     modalIndice?.addEventListener('click', (e) => {
-      if (e.target === modalIndice) modalIndice.classList.remove('active');
+      if (e.target === modalIndice) cerrarModal(modalIndice);
     });
 
-    btnAbrirBiblioteca?.addEventListener('click', () => modalBiblioteca?.classList.add('active'));
-    btnCloseBiblioteca?.addEventListener('click', () => modalBiblioteca?.classList.remove('active'));
+    btnAbrirBiblioteca?.addEventListener('click', () => abrirModal(modalBiblioteca));
+    btnCloseBiblioteca?.addEventListener('click', () => cerrarModal(modalBiblioteca));
     modalBiblioteca?.addEventListener('click', (e) => {
-      if (e.target === modalBiblioteca) modalBiblioteca.classList.remove('active');
+      if (e.target === modalBiblioteca) cerrarModal(modalBiblioteca);
     });
 
-    btnActionTrigger?.addEventListener('click', () => actionSheetBackdrop?.classList.add('active'));
-    btnCloseActionSheet?.addEventListener('click', () => actionSheetBackdrop?.classList.remove('active'));
+    btnActionTrigger?.addEventListener('click', () => abrirModal(actionSheetBackdrop));
+    btnCloseActionSheet?.addEventListener('click', () => cerrarModal(actionSheetBackdrop));
     actionSheetBackdrop?.addEventListener('click', (e) => {
-      if (e.target === actionSheetBackdrop) actionSheetBackdrop.classList.remove('active');
+      if (e.target === actionSheetBackdrop) cerrarModal(actionSheetBackdrop);
     });
 
     btnOptCasos?.addEventListener('click', () => {
-      actionSheetBackdrop?.classList.remove('active');
-      modalCasos?.classList.add('active');
+      cerrarModal(actionSheetBackdrop);
+      abrirModal(modalCasos);
     });
-    btnCloseCasos?.addEventListener('click', () => modalCasos?.classList.remove('active'));
+    btnCloseCasos?.addEventListener('click', () => cerrarModal(modalCasos));
     modalCasos?.addEventListener('click', (e) => {
-      if (e.target === modalCasos) modalCasos.classList.remove('active');
+      if (e.target === modalCasos) cerrarModal(modalCasos);
     });
 
     btnOptPerfil?.addEventListener('click', () => {
-      actionSheetBackdrop?.classList.remove('active');
-      modalPerfil?.classList.add('active');
+      cerrarModal(actionSheetBackdrop);
+      abrirModal(modalPerfil);
     });
-    btnClosePerfil?.addEventListener('click', () => modalPerfil?.classList.remove('active'));
+    btnClosePerfil?.addEventListener('click', () => cerrarModal(modalPerfil));
     modalPerfil?.addEventListener('click', (e) => {
-      if (e.target === modalPerfil) modalPerfil.classList.remove('active');
+      if (e.target === modalPerfil) cerrarModal(modalPerfil);
     });
 
     btnOptConfig?.addEventListener('click', () => {
-      actionSheetBackdrop?.classList.remove('active');
-      modalConfig?.classList.add('active');
+      cerrarModal(actionSheetBackdrop);
+      abrirModal(modalConfig);
     });
-    btnCloseConfig?.addEventListener('click', () => modalConfig?.classList.remove('active'));
+    btnCloseConfig?.addEventListener('click', () => cerrarModal(modalConfig));
     modalConfig?.addEventListener('click', (e) => {
-      if (e.target === modalConfig) modalConfig.classList.remove('active');
+      if (e.target === modalConfig) cerrarModal(modalConfig);
     });
 
     btnAbrirGuiaInstalacion?.addEventListener('click', () => {
-      modalConfig?.classList.remove('active');
-      modalInstalar?.classList.add('active');
+      cerrarModal(modalConfig);
+      abrirModal(modalInstalar);
     });
-    btnCloseModal?.addEventListener('click', () => modalInstalar?.classList.remove('active'));
+    btnCloseModal?.addEventListener('click', () => cerrarModal(modalInstalar));
     modalInstalar?.addEventListener('click', (e) => {
-      if (e.target === modalInstalar) modalInstalar.classList.remove('active');
+      if (e.target === modalInstalar) cerrarModal(modalInstalar);
     });
 
     function renderizarListaCasos() {
@@ -811,7 +828,7 @@
     });
 
     function navegarCasoArticulo(norma, artNum) {
-      modalCasos?.classList.remove('active');
+      cerrarModal(modalCasos);
       if (norma !== normaActiva) {
         cambiarNorma(norma, false);
       }
@@ -836,6 +853,7 @@
       setFontFamily(savedFont, false);
     }
 
+    // Escala global que impacta en toda la app
     function setFontSize(val, guardar = true) {
       document.documentElement.setAttribute('data-size', val);
       document.body.setAttribute('data-size', val);
