@@ -1,5 +1,4 @@
-const CACHE_NAME = 'legal-suite-cache-v2.0.0'; // Incrementar versión ante cambios mayores
-const STATIC_ASSETS = [
+const CACHE_NAME = 'legal-suite-v16'; const STATIC_ASSETS = [
   './',
   './index.html',
   './styles.css',
